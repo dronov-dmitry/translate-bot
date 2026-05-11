@@ -1,876 +1,558 @@
-    <!DOCTYPE html>
-    <html lang="ru">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="Voice Translate Bot переводит голосовые и текстовые сообщения прямо в Telegram: распознавание речи, перевод на 20+ языков и озвучка результата.">
-        <title>Voice Translate Bot - голосовой переводчик в Telegram</title>
-        <style>
-            :root {
-                --ink: #14151a;
-                --muted: #656b76;
-                --line: #e5e7df;
-                --paper: #fffdf7;
-                --mist: #f3f7f2;
-                --telegram: #168acd;
-                --teal: #0f9f8f;
-                --coral: #f06449;
-                --gold: #edb83d;
-                --green: #1b7f52;
-                --shadow: 0 24px 70px rgba(29, 35, 42, 0.12);
-            }
-
-            * { box-sizing: border-box; }
-
-            html { scroll-behavior: smooth; }
-
-            body {
-                margin: 0;
-                color: var(--ink);
-                background: var(--paper);
-                font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-                line-height: 1.5;
-            }
-
-            a { color: inherit; }
-
-            .page {
-                overflow: hidden;
-                background:
-                    linear-gradient(90deg, rgba(20, 21, 26, 0.035) 1px, transparent 1px),
-                    linear-gradient(rgba(20, 21, 26, 0.035) 1px, transparent 1px),
-                    var(--paper);
-                background-size: 44px 44px;
-            }
-
-            .shell {
-                width: min(1160px, calc(100% - 40px));
-                margin: 0 auto;
-            }
-
-            .nav {
-                position: fixed;
-                inset: 0 0 auto;
-                z-index: 20;
-                border-bottom: 1px solid rgba(20, 21, 26, 0.08);
-                background: rgba(255, 253, 247, 0.86);
-                backdrop-filter: blur(18px);
-            }
-
-            .nav-inner {
-                min-height: 72px;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 24px;
-            }
-
-            .brand {
-                display: inline-flex;
-                align-items: center;
-                gap: 10px;
-                font-weight: 860;
-                text-decoration: none;
-            }
-
-            .brand-mark {
-                width: 34px;
-                height: 34px;
-                display: grid;
-                place-items: center;
-                border: 1px solid rgba(20, 21, 26, 0.12);
-                border-radius: 8px;
-                background: #ffffff;
-                color: var(--telegram);
-                box-shadow: 0 8px 24px rgba(20, 21, 26, 0.08);
-            }
-
-            .nav-links {
-                display: flex;
-                align-items: center;
-                gap: 22px;
-                color: #464b53;
-                font-size: 14px;
-                font-weight: 680;
-            }
-
-            .nav-links a {
-                text-decoration: none;
-            }
-
-            .btn {
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                gap: 10px;
-                min-height: 48px;
-                padding: 0 20px;
-                border: 1px solid transparent;
-                border-radius: 8px;
-                font-size: 15px;
-                font-weight: 780;
-                text-decoration: none;
-                transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
-                white-space: nowrap;
-            }
-
-            .btn:hover {
-                transform: translateY(-1px);
-            }
-
-            .btn-primary {
-                color: #fff;
-                background: var(--telegram);
-                box-shadow: 0 16px 36px rgba(22, 138, 205, 0.28);
-            }
-
-            .btn-primary:hover { background: #087cbd; }
-
-            .btn-secondary {
-                color: var(--ink);
-                background: rgba(255, 255, 255, 0.78);
-                border-color: rgba(20, 21, 26, 0.12);
-            }
-
-            .hero {
-                position: relative;
-                min-height: 760px;
-                padding: 154px 0 84px;
-                display: grid;
-                align-items: center;
-                isolation: isolate;
-                background:
-                    linear-gradient(115deg, rgba(255, 253, 247, 0.96) 0%, rgba(255, 253, 247, 0.82) 46%, rgba(243, 247, 242, 0.52) 100%);
-            }
-
-            .hero-visual {
-                position: absolute;
-                inset: 92px 18px 0 auto;
-                width: min(640px, 52vw);
-                z-index: -1;
-                opacity: 0.96;
-            }
-
-            .signal-board {
-                position: relative;
-                min-height: 620px;
-            }
-
-            .phone {
-                position: absolute;
-                right: 58px;
-                top: 12px;
-                width: 330px;
-                min-height: 610px;
-                border: 1px solid rgba(20, 21, 26, 0.16);
-                border-radius: 34px;
-                background: #fcfaf2;
-                box-shadow: var(--shadow);
-                padding: 18px;
-                transform: rotate(2deg);
-            }
-
-            .phone::before {
-                content: "";
-                position: absolute;
-                top: 10px;
-                left: 50%;
-                width: 92px;
-                height: 5px;
-                border-radius: 999px;
-                background: rgba(20, 21, 26, 0.18);
-                transform: translateX(-50%);
-            }
-
-            .phone-screen {
-                min-height: 572px;
-                padding: 30px 15px 16px;
-                border-radius: 24px;
-                background: linear-gradient(180deg, #f7fbf8 0%, #ffffff 100%);
-                border: 1px solid rgba(20, 21, 26, 0.08);
-            }
-
-            .chat-head {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding-bottom: 16px;
-                border-bottom: 1px solid rgba(20, 21, 26, 0.08);
-                font-size: 12px;
-                color: var(--muted);
-            }
-
-            .bot-name {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                color: var(--ink);
-                font-weight: 820;
-            }
-
-            .avatar {
-                width: 28px;
-                height: 28px;
-                display: grid;
-                place-items: center;
-                border-radius: 8px;
-                color: #fff;
-                background: var(--teal);
-                font-size: 14px;
-            }
-
-            .bubble {
-                width: fit-content;
-                max-width: 92%;
-                margin-top: 18px;
-                padding: 12px 13px;
-                border-radius: 8px;
-                font-size: 13px;
-                box-shadow: 0 10px 28px rgba(20, 21, 26, 0.06);
-            }
-
-            .bubble.user {
-                margin-left: auto;
-                color: #fff;
-                background: var(--telegram);
-            }
-
-            .bubble.bot {
-                background: #ffffff;
-                border: 1px solid rgba(20, 21, 26, 0.08);
-            }
-
-            .wave {
-                display: flex;
-                align-items: center;
-                gap: 4px;
-                min-width: 160px;
-                height: 28px;
-            }
-
-            .wave span {
-                width: 4px;
-                border-radius: 999px;
-                background: currentColor;
-                opacity: 0.86;
-            }
-
-            .wave span:nth-child(1) { height: 8px; }
-            .wave span:nth-child(2) { height: 18px; }
-            .wave span:nth-child(3) { height: 24px; }
-            .wave span:nth-child(4) { height: 14px; }
-            .wave span:nth-child(5) { height: 26px; }
-            .wave span:nth-child(6) { height: 12px; }
-            .wave span:nth-child(7) { height: 20px; }
-            .wave span:nth-child(8) { height: 9px; }
-
-            .language-strip {
-                position: absolute;
-                left: 18px;
-                top: 96px;
-                width: 196px;
-                padding: 12px;
-                display: grid;
-                gap: 8px;
-                border: 1px solid rgba(20, 21, 26, 0.1);
-                border-radius: 8px;
-                background: rgba(255, 255, 255, 0.84);
-                box-shadow: 0 18px 50px rgba(20, 21, 26, 0.1);
-                backdrop-filter: blur(16px);
-                transform: rotate(-5deg);
-            }
-
-            .lang-row {
-                display: flex;
-                justify-content: space-between;
-                gap: 10px;
-                padding: 9px 10px;
-                border-radius: 7px;
-                background: #fffaf0;
-                color: #3e444c;
-                font-size: 13px;
-                font-weight: 740;
-            }
-
-            .lang-row:nth-child(2) { background: #eef9f6; }
-            .lang-row:nth-child(3) { background: #fff1ec; }
-
-            .status-panel {
-                position: absolute;
-                right: 18px;
-                bottom: 34px;
-                width: 236px;
-                padding: 16px;
-                border: 1px solid rgba(20, 21, 26, 0.1);
-                border-radius: 8px;
-                background: #ffffff;
-                box-shadow: 0 20px 54px rgba(20, 21, 26, 0.11);
-            }
-
-            .status-panel strong {
-                display: block;
-                font-size: 15px;
-            }
-
-            .status-panel p {
-                margin: 7px 0 0;
-                color: var(--muted);
-                font-size: 13px;
-            }
-
-            .hero-copy {
-                max-width: 650px;
-                padding-top: 18px;
-            }
-
-            .eyebrow {
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-                margin-bottom: 18px;
-                padding: 8px 10px;
-                border: 1px solid rgba(20, 21, 26, 0.1);
-                border-radius: 8px;
-                background: rgba(255, 255, 255, 0.72);
-                color: #3d4650;
-                font-size: 13px;
-                font-weight: 760;
-            }
-
-            .dot {
-                width: 8px;
-                height: 8px;
-                border-radius: 50%;
-                background: var(--green);
-                box-shadow: 0 0 0 5px rgba(27, 127, 82, 0.12);
-            }
-
-            h1 {
-                margin: 0;
-                max-width: 720px;
-                font-size: clamp(44px, 7vw, 88px);
-                line-height: 0.94;
-                letter-spacing: 0;
-            }
-
-            .hero-copy > p {
-                max-width: 560px;
-                margin: 26px 0 0;
-                color: #4e555f;
-                font-size: 20px;
-            }
-
-            .hero-actions {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 12px;
-                margin-top: 34px;
-            }
-
-            .proof {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 14px;
-                margin-top: 38px;
-            }
-
-            .proof-item {
-                min-width: 134px;
-                padding-right: 18px;
-                border-right: 1px solid rgba(20, 21, 26, 0.12);
-            }
-
-            .proof-item:last-child { border-right: 0; }
-
-            .proof-item strong {
-                display: block;
-                font-size: 24px;
-                line-height: 1;
-            }
-
-            .proof-item span {
-                display: block;
-                margin-top: 8px;
-                color: var(--muted);
-                font-size: 13px;
-                font-weight: 680;
-            }
-
-            section {
-                padding: 86px 0;
-                border-top: 1px solid rgba(20, 21, 26, 0.08);
-            }
-
-            .section-head {
-                max-width: 760px;
-                margin-bottom: 34px;
-            }
-
-            .section-kicker {
-                margin: 0 0 10px;
-                color: var(--teal);
-                font-size: 13px;
-                font-weight: 850;
-                text-transform: uppercase;
-            }
-
-            h2 {
-                margin: 0;
-                font-size: clamp(32px, 4vw, 52px);
-                line-height: 1.03;
-                letter-spacing: 0;
-            }
-
-            .section-head p {
-                margin: 16px 0 0;
-                color: var(--muted);
-                font-size: 18px;
-            }
-
-            .steps {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 14px;
-            }
-
-            .step,
-            .feature,
-            .plan {
-                border: 1px solid rgba(20, 21, 26, 0.1);
-                border-radius: 8px;
-                background: rgba(255, 255, 255, 0.7);
-                box-shadow: 0 16px 42px rgba(20, 21, 26, 0.06);
-            }
-
-            .step { padding: 22px; }
-
-            .step-number {
-                width: 36px;
-                height: 36px;
-                display: grid;
-                place-items: center;
-                border-radius: 8px;
-                background: var(--ink);
-                color: #fff;
-                font-weight: 860;
-            }
-
-            .step h3,
-            .feature h3,
-            .plan h3 {
-                margin: 18px 0 9px;
-                font-size: 20px;
-                line-height: 1.2;
-            }
-
-            .step p,
-            .feature p,
-            .plan p {
-                margin: 0;
-                color: var(--muted);
-            }
-
-            .feature-band {
-                background: var(--mist);
-            }
-
-            .features-grid {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 14px;
-            }
-
-            .feature {
-                min-height: 230px;
-                padding: 20px;
-                background: #ffffff;
-            }
-
-            .feature-icon {
-                width: 42px;
-                height: 42px;
-                display: grid;
-                place-items: center;
-                border-radius: 8px;
-                color: #fff;
-                font-weight: 900;
-            }
-
-            .feature:nth-child(1) .feature-icon { background: var(--telegram); }
-            .feature:nth-child(2) .feature-icon { background: var(--teal); }
-            .feature:nth-child(3) .feature-icon { background: var(--coral); }
-            .feature:nth-child(4) .feature-icon { background: var(--gold); color: var(--ink); }
-
-            .pricing {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 18px;
-                align-items: stretch;
-            }
-
-            .plan {
-                padding: 26px;
-                position: relative;
-            }
-
-            .plan.featured {
-                background: #14151a;
-                color: #fff;
-                box-shadow: 0 24px 70px rgba(20, 21, 26, 0.22);
-            }
-
-            .plan.featured p,
-            .plan.featured li { color: rgba(255, 255, 255, 0.72); }
-
-            .badge {
-                display: inline-flex;
-                align-items: center;
-                min-height: 28px;
-                padding: 0 9px;
-                border-radius: 8px;
-                background: rgba(237, 184, 61, 0.18);
-                color: #7a5600;
-                font-size: 12px;
-                font-weight: 850;
-                text-transform: uppercase;
-            }
-
-            .featured .badge {
-                background: var(--gold);
-                color: var(--ink);
-            }
-
-            .price {
-                margin-top: 22px;
-                font-size: 44px;
-                line-height: 1;
-                font-weight: 900;
-            }
-
-            .price small {
-                color: currentColor;
-                font-size: 15px;
-                font-weight: 680;
-                opacity: 0.68;
-            }
-
-            ul {
-                margin: 24px 0 0;
-                padding: 0;
-                list-style: none;
-                display: grid;
-                gap: 12px;
-            }
-
-            li {
-                display: flex;
-                gap: 10px;
-                color: #4f5661;
-                font-weight: 650;
-            }
-
-            li::before {
-                content: "✓";
-                color: var(--green);
-                font-weight: 900;
-            }
-
-            .featured li::before { color: var(--gold); }
-
-            .final-cta {
-                padding: 92px 0;
-                color: #fff;
-                background: #14151a;
-            }
-
-            .final-grid {
-                display: grid;
-                grid-template-columns: minmax(0, 1fr) auto;
-                gap: 28px;
-                align-items: center;
-            }
-
-            .final-cta h2 { max-width: 760px; }
-
-            .final-cta p {
-                max-width: 620px;
-                margin: 16px 0 0;
-                color: rgba(255, 255, 255, 0.68);
-                font-size: 18px;
-            }
-
-            footer {
-                padding: 26px 0;
-                background: #14151a;
-                color: rgba(255, 255, 255, 0.52);
-                border-top: 1px solid rgba(255, 255, 255, 0.1);
-                font-size: 14px;
-            }
-
-            .footer-inner {
-                display: flex;
-                justify-content: space-between;
-                gap: 16px;
-            }
-
-            @media (max-width: 980px) {
-                .hero {
-                    min-height: auto;
-                    padding-bottom: 48px;
-                }
-
-                .hero-visual {
-                    position: relative;
-                    inset: auto;
-                    width: 100%;
-                    margin-top: 34px;
-                    z-index: 0;
-                }
-
-                .signal-board { min-height: 560px; }
-                .phone { right: 8%; }
-                .language-strip { left: 3%; }
-                .status-panel { right: 0; }
-                .features-grid { grid-template-columns: repeat(2, 1fr); }
-            }
-
-            @media (max-width: 760px) {
-                .shell { width: min(100% - 28px, 1160px); }
-                .nav-inner { min-height: 64px; }
-                .nav-links a:not(.btn) { display: none; }
-                .nav .btn { min-height: 40px; padding: 0 12px; font-size: 13px; }
-                .hero { padding-top: 112px; }
-                h1 { font-size: clamp(42px, 15vw, 66px); }
-                .hero-copy > p { font-size: 18px; }
-                .proof { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-                .proof-item { min-width: 0; padding-right: 8px; }
-                .proof-item strong { font-size: 20px; }
-                .steps, .pricing { grid-template-columns: 1fr; }
-                .features-grid { grid-template-columns: 1fr; }
-                .phone {
-                    left: 50%;
-                    right: auto;
-                    width: min(318px, 88vw);
-                    transform: translateX(-50%) rotate(1deg);
-                }
-                .language-strip {
-                    top: 342px;
-                    left: 0;
-                    width: 178px;
-                }
-                .status-panel {
-                    right: 0;
-                    bottom: 4px;
-                    width: 206px;
-                }
-                .final-grid { grid-template-columns: 1fr; }
-                .footer-inner { flex-direction: column; }
-            }
-
-            @media (max-width: 420px) {
-                .brand span:last-child { display: none; }
-                .hero-actions .btn { width: 100%; }
-                .proof { grid-template-columns: 1fr; }
-                .proof-item { border-right: 0; border-bottom: 1px solid rgba(20, 21, 26, 0.1); padding-bottom: 12px; }
-                .signal-board { min-height: 600px; }
-                section { padding: 66px 0; }
-            }
-        </style>
-    </head>
-    <body>
-        <main class="page">
-            <nav class="nav" aria-label="Основная навигация">
-                <div class="shell nav-inner">
-                    <a class="brand" href="#top" aria-label="Voice Translate Bot">
-                        <span class="brand-mark">▶</span>
-                        <span>Voice Translate Bot</span>
-                    </a>
-                    <div class="nav-links">
-                        <a href="#how">Как работает</a>
-                        <a href="#features">Возможности</a>
-                        <a href="#premium">Premium</a>
-                        <a class="btn btn-primary" href="https://t.me/translate_lng_bot">Открыть в Telegram</a>
-                    </div>
-                </div>
-            </nav>
-
-            <header class="hero" id="top">
-                <div class="hero-visual" aria-hidden="true">
-                    <div class="signal-board">
-                        <div class="language-strip">
-                            <div class="lang-row"><span>RU</span><span>→ English</span></div>
-                            <div class="lang-row"><span>DE</span><span>→ Русский</span></div>
-                            <div class="lang-row"><span>ES</span><span>→ Français</span></div>
-                        </div>
-                        <div class="phone">
-                            <div class="phone-screen">
-                                <div class="chat-head">
-                                    <span class="bot-name"><span class="avatar">AI</span> Translate Bot</span>
-                                    <span>online</span>
-                                </div>
-                                <div class="bubble user">
-                                    <div class="wave">
-                                        <span></span><span></span><span></span><span></span>
-                                        <span></span><span></span><span></span><span></span>
-                                    </div>
-                                </div>
-                                <div class="bubble bot">
-                                    <strong>Распознано</strong><br>
-                                    Где находится ближайшая станция метро?
-                                </div>
-                                <div class="bubble bot">
-                                    <strong>Translation</strong><br>
-                                    Where is the nearest metro station?
-                                </div>
-                                <div class="bubble user">Озвучить перевод</div>
-                                <div class="bubble bot">
-                                    Готово. Отправил голосовое сообщение на английском.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="status-panel">
-                            <strong>20+ языков в одном чате</strong>
-                            <p>Выберите язык один раз, дальше просто отправляйте текст или голос.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="shell">
-                    <div class="hero-copy">
-                        <span class="eyebrow"><span class="dot"></span> Telegram-бот для перевода голоса и текста</span>
-                        <h1>Говорите на любом языке прямо в Telegram</h1>
-                        <p>Voice Translate Bot распознает голосовые сообщения, переводит текст и может озвучить результат. Без новых приложений, сложных настроек и переключения между сервисами.</p>
-                        <div class="hero-actions">
-                            <a class="btn btn-primary" href="https://t.me/translate_lng_bot">Запустить бота</a>
-                            <a class="btn btn-secondary" href="#how">Посмотреть сценарий</a>
-                        </div>
-                        <div class="proof" aria-label="Ключевые преимущества">
-                            <div class="proof-item">
-                                <strong>20+</strong>
-                                <span>языков перевода</span>
-                            </div>
-                            <div class="proof-item">
-                                <strong>3</strong>
-                                <span>режима ответа</span>
-                            </div>
-                            <div class="proof-item">
-                                <strong>0</strong>
-                                <span>лишних приложений</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <section id="how">
-                <div class="shell">
-                    <div class="section-head">
-                        <p class="section-kicker">Сценарий</p>
-                        <h2>Один привычный чат вместо набора переводчиков</h2>
-                        <p>Лендинг ведет к главному действию: открыть Telegram и сразу попробовать перевод голосового или текстового сообщения.</p>
-                    </div>
-                    <div class="steps">
-                        <article class="step">
-                            <div class="step-number">1</div>
-                            <h3>Отправьте голос</h3>
-                            <p>Бот принимает обычные voice messages и автоматически распознает речь.</p>
-                        </article>
-                        <article class="step">
-                            <div class="step-number">2</div>
-                            <h3>Получите перевод</h3>
-                            <p>Результат приходит в чат текстом, с учетом выбранного целевого языка.</p>
-                        </article>
-                        <article class="step">
-                            <div class="step-number">3</div>
-                            <h3>Включите озвучку</h3>
-                            <p>Можно оставить только текст, только голос или оба формата ответа.</p>
-                        </article>
-                    </div>
-                </div>
-            </section>
-
-            <section class="feature-band" id="features">
-                <div class="shell">
-                    <div class="section-head">
-                        <p class="section-kicker">Возможности</p>
-                        <h2>Сделано для быстрых разговоров, поездок и рабочих переписок</h2>
-                        <p>Страница подчеркивает практическую ценность: меньше копирования, больше живой коммуникации.</p>
-                    </div>
-                    <div class="features-grid">
-                        <article class="feature">
-                            <div class="feature-icon">V</div>
-                            <h3>Голосовые сообщения</h3>
-                            <p>Переводите voice messages без ручной расшифровки и пересылки в сторонние сервисы.</p>
-                        </article>
-                        <article class="feature">
-                            <div class="feature-icon">T</div>
-                            <h3>Текстовый перевод</h3>
-                            <p>Отправьте фразу, письмо или заметку, чтобы быстро получить перевод в нужном языке.</p>
-                        </article>
-                        <article class="feature">
-                            <div class="feature-icon">S</div>
-                            <h3>Озвучивание</h3>
-                            <p>Слушайте перевод как аудио, когда нужно произношение или ответ голосом.</p>
-                        </article>
-                        <article class="feature">
-                            <div class="feature-icon">P</div>
-                            <h3>Настройки и Premium</h3>
-                            <p>Бот запоминает язык, формат ответа и открывает безлимитный режим для активных пользователей.</p>
-                        </article>
-                    </div>
-                </div>
-            </section>
-
-            <section id="premium">
-                <div class="shell">
-                    <div class="section-head">
-                        <p class="section-kicker">Тарифы</p>
-                        <h2>Начните бесплатно, снимите лимиты когда бот станет ежедневным инструментом</h2>
-                    </div>
-                    <div class="pricing">
-                        <article class="plan">
-                            <span class="badge">Free</span>
-                            <h3>Для первых переводов</h3>
-                            <p>Подходит, чтобы проверить качество перевода и настроить удобный формат ответа.</p>
-                            <div class="price">20 <small>переводов в день</small></div>
-                            <ul>
-                                <li>Голосовые и текстовые сообщения</li>
-                                <li>Выбор целевого языка</li>
-                                <li>Текстовый или голосовой ответ</li>
-                            </ul>
-                        </article>
-                        <article class="plan featured">
-                            <span class="badge">Premium</span>
-                            <h3>Для постоянного использования</h3>
-                            <p>Безлимитные переводы, приоритетная обработка и поддержка развития проекта.</p>
-                            <div class="price">$3 <small>/ месяц</small></div>
-                            <ul>
-                                <li>Безлимитные переводы</li>
-                                <li>Приоритетная обработка</li>
-                                <li>Годовой план $30 с экономией</li>
-                            </ul>
-                        </article>
-                    </div>
-                </div>
-            </section>
-
-            <section class="final-cta">
-                <div class="shell final-grid">
-                    <div>
-                        <h2>Попробуйте перевод голоса в следующем сообщении</h2>
-                        <p>Откройте бота, нажмите Start и отправьте фразу или голосовое. Самый короткий путь к ценности - прямо в Telegram.</p>
-                    </div>
-                    <a class="btn btn-primary" href="https://t.me/translate_lng_bot">Открыть @translate_lng_bot</a>
-                </div>
-            </section>
-
-            <footer>
-                <div class="shell footer-inner">
-                    <span>&copy; 2026 Voice Translate Bot</span>
-                    <span>Powered by Paymento.io</span>
-                </div>
-            </footer>
-        </main>
-    </body>
-    </html>
-    
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Voice Translate Bot translates voice and text messages directly in Telegram: speech recognition, translation to 20+ languages and text-to-speech output.">
+  <title>Voice Translate Bot - voice translator in Telegram</title>
+  <style>
+    :root {
+      --ink: #14151a;
+      --muted: #656b76;
+      --line: rgba(20, 21, 26, 0.1);
+      --paper: #fffdf7;
+      --mist: #f3f7f2;
+      --telegram: #168acd;
+      --teal: #0f9f8f;
+      --coral: #f06449;
+      --gold: #edb83d;
+      --green: #1b7f52;
+      --shadow: 0 24px 70px rgba(29, 35, 42, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+      text-rendering: optimizeLegibility;
+    }
+    a { color: inherit; }
+
+    .page {
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(20, 21, 26, 0.035) 1px, transparent 1px),
+        linear-gradient(rgba(20, 21, 26, 0.035) 1px, transparent 1px),
+        var(--paper);
+      background-size: 34px 34px;
+    }
+    .shell {
+      width: min(100% - 28px, 1160px);
+      margin: 0 auto;
+    }
+
+    .nav {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 20;
+      border-bottom: 1px solid rgba(20, 21, 26, 0.08);
+      background: rgba(255, 253, 247, 0.9);
+      backdrop-filter: blur(18px);
+    }
+    .nav-inner {
+      min-height: 64px;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 10px;
+    }
+    .brand {
+      min-width: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 860;
+      text-decoration: none;
+    }
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(20, 21, 26, 0.12);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--telegram);
+      box-shadow: 0 8px 24px rgba(20, 21, 26, 0.08);
+    }
+    .brand-text {
+      max-width: 38vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .nav-links {
+      min-width: 0;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      color: #464b53;
+      font-size: 14px;
+      font-weight: 680;
+    }
+    .nav-links a:not(.btn) { display: none; text-decoration: none; }
+
+    .language-switcher {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 74px;
+      height: 40px;
+      padding: 0 8px;
+      border: 1px solid rgba(20, 21, 26, 0.12);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.78);
+      color: var(--ink);
+    }
+    .language-switcher select {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 0 18px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 780;
+      text-decoration: none;
+      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
+      white-space: nowrap;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { color: #fff; background: var(--telegram); box-shadow: 0 16px 36px rgba(22, 138, 205, 0.28); }
+    .btn-primary:hover { background: #087cbd; }
+    .btn-secondary { color: var(--ink); background: rgba(255, 255, 255, 0.78); border-color: rgba(20, 21, 26, 0.12); }
+    .nav .btn { display: none; min-height: 40px; padding: 0 12px; font-size: 13px; }
+
+    .hero {
+      position: relative;
+      padding: 104px 0 54px;
+      isolation: isolate;
+      background: linear-gradient(115deg, rgba(255, 253, 247, 0.96) 0%, rgba(255, 253, 247, 0.82) 54%, rgba(243, 247, 242, 0.52) 100%);
+    }
+    .hero-copy { max-width: 650px; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      max-width: 100%;
+      margin-bottom: 18px;
+      padding: 8px 10px;
+      border: 1px solid rgba(20, 21, 26, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.72);
+      color: #3d4650;
+      font-size: 13px;
+      font-weight: 760;
+    }
+    .dot { width: 8px; height: 8px; flex: 0 0 auto; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 5px rgba(27, 127, 82, 0.12); }
+    h1, h2 { margin: 0; letter-spacing: 0; overflow-wrap: anywhere; }
+    h1 { max-width: 720px; font-size: clamp(42px, 14vw, 64px); line-height: 0.98; }
+    .hero-copy > p { max-width: 560px; margin: 22px 0 0; color: #4e555f; font-size: 18px; }
+    .hero-actions { display: grid; gap: 10px; margin-top: 28px; }
+    .hero-actions .btn { width: 100%; }
+
+    .proof {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 30px;
+    }
+    .proof-item {
+      padding: 0 0 12px;
+      border-bottom: 1px solid rgba(20, 21, 26, 0.1);
+    }
+    .proof-item strong { display: block; font-size: 22px; line-height: 1; }
+    .proof-item span { display: block; margin-top: 8px; color: var(--muted); font-size: 13px; font-weight: 680; }
+
+    .hero-visual {
+      width: 100%;
+      margin-top: 34px;
+    }
+    .signal-board {
+      position: relative;
+      min-height: 602px;
+    }
+    .phone {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: min(318px, 88vw);
+      min-height: 592px;
+      border: 1px solid rgba(20, 21, 26, 0.16);
+      border-radius: 34px;
+      background: #fcfaf2;
+      box-shadow: var(--shadow);
+      padding: 18px;
+      transform: translateX(-50%) rotate(1deg);
+    }
+    .phone::before {
+      content: "";
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      width: 92px;
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(20, 21, 26, 0.18);
+      transform: translateX(-50%);
+    }
+    .phone-screen {
+      min-height: 554px;
+      padding: 30px 15px 16px;
+      border-radius: 24px;
+      background: linear-gradient(180deg, #f7fbf8 0%, #fff 100%);
+      border: 1px solid rgba(20, 21, 26, 0.08);
+    }
+    .chat-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(20, 21, 26, 0.08);
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .bot-name { display: flex; align-items: center; gap: 8px; color: var(--ink); font-weight: 820; }
+    .avatar { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; color: #fff; background: var(--teal); font-size: 14px; }
+    .bubble {
+      width: fit-content;
+      max-width: 92%;
+      margin-top: 18px;
+      padding: 12px 13px;
+      border-radius: 8px;
+      font-size: 13px;
+      box-shadow: 0 10px 28px rgba(20, 21, 26, 0.06);
+      overflow-wrap: anywhere;
+    }
+    .bubble.user { margin-left: auto; color: #fff; background: var(--telegram); }
+    .bubble.bot { background: #fff; border: 1px solid rgba(20, 21, 26, 0.08); }
+    .wave { display: flex; align-items: center; gap: 4px; min-width: 150px; height: 28px; }
+    .wave span { width: 4px; border-radius: 999px; background: currentColor; opacity: 0.86; }
+    .wave span:nth-child(1) { height: 8px; }
+    .wave span:nth-child(2) { height: 18px; }
+    .wave span:nth-child(3) { height: 24px; }
+    .wave span:nth-child(4) { height: 14px; }
+    .wave span:nth-child(5) { height: 26px; }
+    .wave span:nth-child(6) { height: 12px; }
+    .wave span:nth-child(7) { height: 20px; }
+    .wave span:nth-child(8) { height: 9px; }
+    .language-strip {
+      position: absolute;
+      top: 334px;
+      left: 0;
+      width: min(178px, 48vw);
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+      border: 1px solid rgba(20, 21, 26, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.84);
+      box-shadow: 0 18px 50px rgba(20, 21, 26, 0.1);
+      backdrop-filter: blur(16px);
+      transform: rotate(-4deg);
+    }
+    .lang-row { display: flex; justify-content: space-between; gap: 10px; padding: 9px 10px; border-radius: 7px; background: #fffaf0; color: #3e444c; font-size: 13px; font-weight: 740; }
+    .lang-row:nth-child(2) { background: #eef9f6; }
+    .lang-row:nth-child(3) { background: #fff1ec; }
+    .status-panel {
+      position: absolute;
+      right: 0;
+      bottom: 4px;
+      width: min(206px, 56vw);
+      padding: 16px;
+      border: 1px solid rgba(20, 21, 26, 0.1);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 20px 54px rgba(20, 21, 26, 0.11);
+    }
+    .status-panel strong { display: block; font-size: 15px; }
+    .status-panel p { margin: 7px 0 0; color: var(--muted); font-size: 13px; }
+
+    section { padding: 64px 0; border-top: 1px solid rgba(20, 21, 26, 0.08); }
+    .section-head { max-width: 760px; margin-bottom: 28px; }
+    .section-kicker { margin: 0 0 10px; color: var(--teal); font-size: 13px; font-weight: 850; text-transform: uppercase; }
+    h2 { font-size: clamp(32px, 10vw, 46px); line-height: 1.05; }
+    .section-head p { margin: 16px 0 0; color: var(--muted); font-size: 17px; }
+
+    .steps, .features-grid, .pricing { display: grid; grid-template-columns: 1fr; gap: 14px; }
+    .step, .feature, .plan {
+      border: 1px solid rgba(20, 21, 26, 0.1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 16px 42px rgba(20, 21, 26, 0.06);
+    }
+    .step, .feature { padding: 20px; }
+    .step-number { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 8px; background: var(--ink); color: #fff; font-weight: 860; }
+    .step h3, .feature h3, .plan h3 { margin: 18px 0 9px; font-size: 20px; line-height: 1.2; overflow-wrap: anywhere; }
+    .step p, .feature p, .plan p { margin: 0; color: var(--muted); }
+    .feature-band { background: var(--mist); }
+    .feature { min-height: 218px; background: #fff; }
+    .feature-icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 8px; color: #fff; font-weight: 900; }
+    .feature:nth-child(1) .feature-icon { background: var(--telegram); }
+    .feature:nth-child(2) .feature-icon { background: var(--teal); }
+    .feature:nth-child(3) .feature-icon { background: var(--coral); }
+    .feature:nth-child(4) .feature-icon { background: var(--gold); color: var(--ink); }
+
+    .plan { padding: 24px; position: relative; }
+    .plan.featured { background: #14151a; color: #fff; box-shadow: 0 24px 70px rgba(20, 21, 26, 0.22); }
+    .plan.featured p, .plan.featured li { color: rgba(255, 255, 255, 0.72); }
+    .badge { display: inline-flex; align-items: center; min-height: 28px; padding: 0 9px; border-radius: 8px; background: rgba(237, 184, 61, 0.18); color: #7a5600; font-size: 12px; font-weight: 850; text-transform: uppercase; }
+    .featured .badge { background: var(--gold); color: var(--ink); }
+    .price { margin-top: 22px; font-size: 42px; line-height: 1; font-weight: 900; overflow-wrap: anywhere; }
+    .price small { color: currentColor; font-size: 15px; font-weight: 680; opacity: 0.68; }
+    ul { margin: 24px 0 0; padding: 0; list-style: none; display: grid; gap: 12px; }
+    li { display: flex; gap: 10px; color: #4f5661; font-weight: 650; }
+    li::before { content: "✓"; color: var(--green); font-weight: 900; }
+    .featured li::before { color: var(--gold); }
+
+    .final-cta { padding: 72px 0; color: #fff; background: #14151a; }
+    .final-grid { display: grid; grid-template-columns: 1fr; gap: 24px; align-items: center; }
+    .final-cta h2 { max-width: 760px; }
+    .final-cta p { max-width: 620px; margin: 16px 0 0; color: rgba(255, 255, 255, 0.68); font-size: 18px; }
+    .final-cta .btn { width: 100%; }
+    footer { padding: 26px 0; background: #14151a; color: rgba(255, 255, 255, 0.52); border-top: 1px solid rgba(255, 255, 255, 0.1); font-size: 14px; }
+    .footer-inner { display: flex; flex-direction: column; gap: 8px; }
+
+    @media (min-width: 430px) {
+      .hero-actions { display: flex; flex-wrap: wrap; }
+      .hero-actions .btn { width: auto; }
+      .proof { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .proof-item { min-width: 0; padding: 0 8px 0 0; border-bottom: 0; border-right: 1px solid rgba(20, 21, 26, 0.12); }
+      .proof-item:last-child { border-right: 0; }
+      .final-cta .btn { width: auto; justify-self: start; }
+    }
+
+    @media (min-width: 700px) {
+      .shell { width: min(100% - 40px, 1160px); }
+      .nav-inner { min-height: 72px; display: flex; justify-content: space-between; gap: 20px; }
+      .brand-text { max-width: none; }
+      .nav .btn { display: inline-flex; }
+      .hero { padding-top: 132px; }
+      h1 { font-size: clamp(52px, 9vw, 78px); }
+      .hero-copy > p { font-size: 20px; }
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .pricing { grid-template-columns: 1fr 1fr; gap: 18px; }
+      .footer-inner { flex-direction: row; justify-content: space-between; gap: 16px; }
+    }
+
+    @media (min-width: 900px) {
+      .page { background-size: 44px 44px; }
+      .nav-links { gap: 18px; }
+      .nav-links a:not(.btn) { display: inline-flex; }
+      .language-switcher { min-width: 82px; }
+      .hero { min-height: 760px; padding: 154px 0 84px; display: grid; align-items: center; }
+      .hero-visual { position: absolute; inset: 92px 18px 0 auto; width: min(640px, 52vw); margin-top: 0; z-index: -1; opacity: 0.96; }
+      .signal-board { min-height: 620px; }
+      .phone { left: auto; right: 58px; top: 12px; width: 330px; min-height: 610px; transform: rotate(2deg); }
+      .phone-screen { min-height: 572px; }
+      .language-strip { left: 18px; top: 96px; width: 196px; transform: rotate(-5deg); }
+      .status-panel { right: 18px; bottom: 34px; width: 236px; }
+      .steps { grid-template-columns: repeat(3, 1fr); }
+      .features-grid { grid-template-columns: repeat(4, 1fr); }
+      .final-grid { grid-template-columns: minmax(0, 1fr) auto; gap: 28px; }
+      .final-cta .btn { justify-self: end; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <nav class="nav" aria-label="Main navigation">
+      <div class="shell nav-inner">
+        <a class="brand" href="#top" aria-label="Voice Translate Bot">
+          <span class="brand-mark" aria-hidden="true">▶</span>
+          <span class="brand-text" data-i18n="brand">Voice Translate Bot</span>
+        </a>
+        <div class="nav-links">
+          <a href="#how" data-i18n="nav_how">How it works</a>
+          <a href="#features" data-i18n="nav_features">Features</a>
+          <a href="#premium" data-i18n="nav_premium">Premium</a>
+          <label class="language-switcher">
+            <span aria-hidden="true">🌐</span>
+            <select id="languageSelect" aria-label="Language"><option value="ru">Русский</option><option value="de">Deutsch</option><option value="en">English</option><option value="fr">Français</option><option value="es">Español</option></select>
+          </label>
+          <a class="btn btn-primary" href="https://t.me/translate_lng_bot" data-i18n="nav_cta">Open in Telegram</a>
+        </div>
+      </div>
+    </nav>
+
+    <header class="hero" id="top">
+      <div class="hero-visual" aria-hidden="true">
+        <div class="signal-board">
+          <div class="language-strip">
+            <div class="lang-row"><span>RU</span><span>→ English</span></div>
+            <div class="lang-row"><span>DE</span><span>→ Русский</span></div>
+            <div class="lang-row"><span>ES</span><span>→ Français</span></div>
+          </div>
+          <div class="phone">
+            <div class="phone-screen">
+              <div class="chat-head">
+                <span class="bot-name"><span class="avatar">AI</span> Translate Bot</span>
+                <span>online</span>
+              </div>
+              <div class="bubble user"><div class="wave"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
+              <div class="bubble bot"><strong data-i18n="chat_recognized">Recognized</strong><br><span data-i18n="chat_user_question">Where is the nearest metro station?</span></div>
+              <div class="bubble bot"><strong data-i18n="chat_translation">Translation</strong><br><span data-i18n="chat_translation_result">Where is the nearest metro station?</span></div>
+              <div class="bubble user" data-i18n="chat_user_request">Voice the translation</div>
+              <div class="bubble bot" data-i18n="chat_bot_response">Done. Sent a voice message in English.</div>
+            </div>
+          </div>
+          <div class="status-panel">
+            <strong data-i18n="status_panel_title">20+ languages in one chat</strong>
+            <p data-i18n="status_panel_text">Choose a language once, then just send text or voice.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="shell">
+        <div class="hero-copy">
+          <span class="eyebrow"><span class="dot"></span><span data-i18n="eyebrow">Telegram bot for voice and text translation</span></span>
+          <h1 data-i18n="hero_h1">Speak any language directly in Telegram</h1>
+          <p data-i18n="hero_p">Voice Translate Bot recognizes voice messages, translates text and can voice the result. No new apps, complex settings or switching between services.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="https://t.me/translate_lng_bot" data-i18n="hero_cta_primary">Start the bot</a>
+            <a class="btn btn-secondary" href="#how" data-i18n="hero_cta_secondary">See how it works</a>
+          </div>
+          <div class="proof" aria-label="Key benefits">
+            <div class="proof-item"><strong data-i18n="proof_1_num">20+</strong><span data-i18n="proof_1_text">translation languages</span></div>
+            <div class="proof-item"><strong data-i18n="proof_2_num">3</strong><span data-i18n="proof_2_text">response modes</span></div>
+            <div class="proof-item"><strong data-i18n="proof_3_num">0</strong><span data-i18n="proof_3_text">extra apps</span></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section id="how">
+      <div class="shell">
+        <div class="section-head">
+          <p class="section-kicker" data-i18n="section_how_kicker">Workflow</p>
+          <h2 data-i18n="section_how_h2">One familiar chat instead of a set of translators</h2>
+          <p data-i18n="section_how_p">The landing page leads to the main action: open Telegram and immediately try translating a voice or text message.</p>
+        </div>
+        <div class="steps">
+          <article class="step"><div class="step-number">1</div><h3 data-i18n="step_1_h3">Send voice</h3><p data-i18n="step_1_p">The bot accepts regular voice messages and automatically recognizes speech.</p></article>
+          <article class="step"><div class="step-number">2</div><h3 data-i18n="step_2_h3">Get translation</h3><p data-i18n="step_2_p">The result comes to the chat as text, taking into account the selected target language.</p></article>
+          <article class="step"><div class="step-number">3</div><h3 data-i18n="step_3_h3">Enable voice output</h3><p data-i18n="step_3_p">You can leave only text, only voice or both response formats.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="feature-band" id="features">
+      <div class="shell">
+        <div class="section-head">
+          <p class="section-kicker" data-i18n="section_features_kicker">Features</p>
+          <h2 data-i18n="section_features_h2">Made for quick conversations, trips and work correspondence</h2>
+          <p data-i18n="section_features_p">The page emphasizes practical value: less copying, more live communication.</p>
+        </div>
+        <div class="features-grid">
+          <article class="feature"><div class="feature-icon">V</div><h3 data-i18n="feature_1_h3">Voice messages</h3><p data-i18n="feature_1_p">Translate voice messages without manual transcription and forwarding to third-party services.</p></article>
+          <article class="feature"><div class="feature-icon">T</div><h3 data-i18n="feature_2_h3">Text translation</h3><p data-i18n="feature_2_p">Send a phrase, letter or note to quickly get a translation in the desired language.</p></article>
+          <article class="feature"><div class="feature-icon">S</div><h3 data-i18n="feature_3_h3">Voice output</h3><p data-i18n="feature_3_p">Listen to the translation as audio when you need pronunciation or a voice response.</p></article>
+          <article class="feature"><div class="feature-icon">P</div><h3 data-i18n="feature_4_h3">Settings and Premium</h3><p data-i18n="feature_4_p">The bot remembers the language, response format and opens unlimited mode for active users.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="premium">
+      <div class="shell">
+        <div class="section-head">
+          <p class="section-kicker" data-i18n="section_premium_kicker">Pricing</p>
+          <h2 data-i18n="section_premium_h2">Start for free, remove limits when the bot becomes a daily tool</h2>
+        </div>
+        <div class="pricing">
+          <article class="plan">
+            <span class="badge" data-i18n="plan_free_badge">Free</span>
+            <h3 data-i18n="plan_free_h3">For first translations</h3>
+            <p data-i18n="plan_free_p">Suitable for checking translation quality and setting up a convenient response format.</p>
+            <div class="price"><span data-i18n="plan_free_price">20</span> <small data-i18n="plan_free_price_unit">translations per day</small></div>
+            <ul><li data-i18n="plan_free_li_1">Voice and text messages</li><li data-i18n="plan_free_li_2">Target language selection</li><li data-i18n="plan_free_li_3">Text or voice response</li></ul>
+          </article>
+          <article class="plan featured">
+            <span class="badge" data-i18n="plan_premium_badge">Premium</span>
+            <h3 data-i18n="plan_premium_h3">For regular use</h3>
+            <p data-i18n="plan_premium_p">Unlimited translations, priority processing and support for project development.</p>
+            <div class="price"><span data-i18n="plan_premium_price">$3</span> <small data-i18n="plan_premium_price_unit">/ month</small></div>
+            <ul><li data-i18n="plan_premium_li_1">Unlimited translations</li><li data-i18n="plan_premium_li_2">Priority processing</li><li data-i18n="plan_premium_li_3">Annual plan $30 with savings</li></ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta">
+      <div class="shell final-grid">
+        <div><h2 data-i18n="final_cta_h2">Try voice translation in the next message</h2><p data-i18n="final_cta_p">Open the bot, press Start and send a phrase or voice message. The shortest path to value - right in Telegram.</p></div>
+        <a class="btn btn-primary" href="https://t.me/translate_lng_bot" data-i18n="final_cta_btn">Open @translate_lng_bot</a>
+      </div>
+    </section>
+
+    <footer><div class="shell footer-inner"><span data-i18n="footer_copy">© 2026 Voice Translate Bot</span><span data-i18n="footer_powered">Powered by Paymento.io</span></div></footer>
+  </main>
+
+  <script>
+    const TRANSLATIONS = {"ru":{"meta_description":"Voice Translate Bot переводит голосовые и текстовые сообщения прямо в Telegram: распознавание речи, перевод на 20+ языков и озвучка результата.","title":"Voice Translate Bot - голосовой переводчик в Telegram","brand":"Voice Translate Bot","nav_how":"Как работает","nav_features":"Возможности","nav_premium":"Premium","nav_cta":"Открыть в Telegram","eyebrow":"Telegram-бот для перевода голоса и текста","hero_h1":"Говорите на любом языке прямо в Telegram","hero_p":"Voice Translate Bot распознает голосовые сообщения, переводит текст и может озвучить результат. Без новых приложений, сложных настроек и переключения между сервисами.","hero_cta_primary":"Запустить бота","hero_cta_secondary":"Посмотреть сценарий","proof_1_num":"20+","proof_1_text":"языков перевода","proof_2_num":"3","proof_2_text":"режима ответа","proof_3_num":"0","proof_3_text":"лишних приложений","section_how_kicker":"Сценарий","section_how_h2":"Один привычный чат вместо набора переводчиков","section_how_p":"Лендинг ведет к главному действию: открыть Telegram и сразу попробовать перевод голосового или текстового сообщения.","step_1_h3":"Отправьте голос","step_1_p":"Бот принимает обычные voice messages и автоматически распознает речь.","step_2_h3":"Получите перевод","step_2_p":"Результат приходит в чат текстом, с учетом выбранного целевого языка.","step_3_h3":"Включите озвучку","step_3_p":"Можно оставить только текст, только голос или оба формата ответа.","section_features_kicker":"Возможности","section_features_h2":"Сделано для быстрых разговоров, поездок и рабочих переписок","section_features_p":"Страница подчеркивает практическую ценность: меньше копирования, больше живой коммуникации.","feature_1_h3":"Голосовые сообщения","feature_1_p":"Переводите voice messages без ручной расшифровки и пересылки в сторонние сервисы.","feature_2_h3":"Текстовый перевод","feature_2_p":"Отправьте фразу, письмо или заметку, чтобы быстро получить перевод в нужном языке.","feature_3_h3":"Озвучивание","feature_3_p":"Слушайте перевод как аудио, когда нужно произношение или ответ голосом.","feature_4_h3":"Настройки и Premium","feature_4_p":"Бот запоминает язык, формат ответа и открывает безлимитный режим для активных пользователей.","section_premium_kicker":"Тарифы","section_premium_h2":"Начните бесплатно, снимите лимиты когда бот станет ежедневным инструментом","plan_free_badge":"Free","plan_free_h3":"Для первых переводов","plan_free_p":"Подходит, чтобы проверить качество перевода и настроить удобный формат ответа.","plan_free_price":"20","plan_free_price_unit":"переводов в день","plan_free_li_1":"Голосовые и текстовые сообщения","plan_free_li_2":"Выбор целевого языка","plan_free_li_3":"Текстовый или голосовой ответ","plan_premium_badge":"Premium","plan_premium_h3":"Для постоянного использования","plan_premium_p":"Безлимитные переводы, приоритетная обработка и поддержка развития проекта.","plan_premium_price":"$3","plan_premium_price_unit":"/ месяц","plan_premium_li_1":"Безлимитные переводы","plan_premium_li_2":"Приоритетная обработка","plan_premium_li_3":"Годовой план $30 с экономией","final_cta_h2":"Попробуйте перевод голоса в следующем сообщении","final_cta_p":"Откройте бота, нажмите Start и отправьте фразу или голосовое. Самый короткий путь к ценности - прямо в Telegram.","final_cta_btn":"Открыть @translate_lng_bot","footer_copy":"© 2026 Voice Translate Bot","footer_powered":"Powered by Paymento.io","status_panel_title":"20+ языков в одном чате","status_panel_text":"Выберите язык один раз, дальше просто отправляйте текст или голос.","chat_recognized":"Распознано","chat_translation":"Translation","chat_user_request":"Озвучить перевод","chat_bot_response":"Готово. Отправил голосовое сообщение на английском.","chat_user_question":"Где находится ближайшая станция метро?","chat_translation_result":"Where is the nearest metro station?"},"en":{"meta_description":"Voice Translate Bot translates voice and text messages directly in Telegram: speech recognition, translation to 20+ languages and text-to-speech output.","title":"Voice Translate Bot - voice translator in Telegram","brand":"Voice Translate Bot","nav_how":"How it works","nav_features":"Features","nav_premium":"Premium","nav_cta":"Open in Telegram","eyebrow":"Telegram bot for voice and text translation","hero_h1":"Speak any language directly in Telegram","hero_p":"Voice Translate Bot recognizes voice messages, translates text and can voice the result. No new apps, complex settings or switching between services.","hero_cta_primary":"Start the bot","hero_cta_secondary":"See how it works","proof_1_num":"20+","proof_1_text":"translation languages","proof_2_num":"3","proof_2_text":"response modes","proof_3_num":"0","proof_3_text":"extra apps","section_how_kicker":"Workflow","section_how_h2":"One familiar chat instead of a set of translators","section_how_p":"The landing page leads to the main action: open Telegram and immediately try translating a voice or text message.","step_1_h3":"Send voice","step_1_p":"The bot accepts regular voice messages and automatically recognizes speech.","step_2_h3":"Get translation","step_2_p":"The result comes to the chat as text, taking into account the selected target language.","step_3_h3":"Enable voice output","step_3_p":"You can leave only text, only voice or both response formats.","section_features_kicker":"Features","section_features_h2":"Made for quick conversations, trips and work correspondence","section_features_p":"The page emphasizes practical value: less copying, more live communication.","feature_1_h3":"Voice messages","feature_1_p":"Translate voice messages without manual transcription and forwarding to third-party services.","feature_2_h3":"Text translation","feature_2_p":"Send a phrase, letter or note to quickly get a translation in the desired language.","feature_3_h3":"Voice output","feature_3_p":"Listen to the translation as audio when you need pronunciation or a voice response.","feature_4_h3":"Settings and Premium","feature_4_p":"The bot remembers the language, response format and opens unlimited mode for active users.","section_premium_kicker":"Pricing","section_premium_h2":"Start for free, remove limits when the bot becomes a daily tool","plan_free_badge":"Free","plan_free_h3":"For first translations","plan_free_p":"Suitable for checking translation quality and setting up a convenient response format.","plan_free_price":"20","plan_free_price_unit":"translations per day","plan_free_li_1":"Voice and text messages","plan_free_li_2":"Target language selection","plan_free_li_3":"Text or voice response","plan_premium_badge":"Premium","plan_premium_h3":"For regular use","plan_premium_p":"Unlimited translations, priority processing and support for project development.","plan_premium_price":"$3","plan_premium_price_unit":"/ month","plan_premium_li_1":"Unlimited translations","plan_premium_li_2":"Priority processing","plan_premium_li_3":"Annual plan $30 with savings","final_cta_h2":"Try voice translation in the next message","final_cta_p":"Open the bot, press Start and send a phrase or voice message. The shortest path to value - right in Telegram.","final_cta_btn":"Open @translate_lng_bot","footer_copy":"© 2026 Voice Translate Bot","footer_powered":"Powered by Paymento.io","status_panel_title":"20+ languages in one chat","status_panel_text":"Choose a language once, then just send text or voice.","chat_recognized":"Recognized","chat_translation":"Translation","chat_user_request":"Voice the translation","chat_bot_response":"Done. Sent a voice message in English.","chat_user_question":"Where is the nearest metro station?","chat_translation_result":"Where is the nearest metro station?"},"de":{"meta_description":"Voice Translate Bot übersetzt Sprach- und Textnachrichten direkt in Telegram: Spracherkennung, Übersetzung in 20+ Sprachen und Sprachausgabe.","title":"Voice Translate Bot - Sprachübersetzer in Telegram","brand":"Voice Translate Bot","nav_how":"Wie es funktioniert","nav_features":"Funktionen","nav_premium":"Premium","nav_cta":"In Telegram öffnen","eyebrow":"Telegram-Bot für Sprach- und Textübersetzung","hero_h1":"Sprechen Sie jede Sprache direkt in Telegram","hero_p":"Voice Translate Bot erkennt Sprachnachrichten, übersetzt Text und kann das Ergebnis vorlesen. Keine neuen Apps, komplexe Einstellungen oder Wechsel zwischen Diensten.","hero_cta_primary":"Bot starten","hero_cta_secondary":"Sehen Sie, wie es funktioniert","proof_1_num":"20+","proof_1_text":"Übersetzungssprachen","proof_2_num":"3","proof_2_text":"Antwortmodi","proof_3_num":"0","proof_3_text":"zusätzliche Apps","section_how_kicker":"Arbeitsablauf","section_how_h2":"Ein vertrauter Chat statt mehrerer Übersetzer","section_how_p":"Die Landingpage führt zur Hauptaktion: Telegram öffnen und sofort eine Sprach- oder Textnachricht übersetzen.","step_1_h3":"Sprache senden","step_1_p":"Der Bot akzeptiert reguläre Sprachnachrichten und erkennt automatisch Sprache.","step_2_h3":"Übersetzung erhalten","step_2_p":"Das Ergebnis kommt als Text in den Chat, unter Berücksichtigung der ausgewählten Zielsprache.","step_3_h3":"Sprachausgabe aktivieren","step_3_p":"Sie können nur Text, nur Sprache oder beide Antwortformate belassen.","section_features_kicker":"Funktionen","section_features_h2":"Gemacht für schnelle Gespräche, Reisen und Arbeitskorrespondenz","section_features_p":"Die Seite betont den praktischen Wert: weniger Kopieren, mehr Live-Kommunikation.","feature_1_h3":"Sprachnachrichten","feature_1_p":"Übersetzen Sie Sprachnachrichten ohne manuelle Transkription und Weiterleitung an Drittdienste.","feature_2_h3":"Textübersetzung","feature_2_p":"Senden Sie einen Satz, Brief oder eine Notiz, um schnell eine Übersetzung in der gewünschten Sprache zu erhalten.","feature_3_h3":"Sprachausgabe","feature_3_p":"Hören Sie sich die Übersetzung als Audio an, wenn Sie Aussprache oder eine Sprachantwort benötigen.","feature_4_h3":"Einstellungen und Premium","feature_4_p":"Der Bot merkt sich Sprache, Antwortformat und öffnet unbegrenzten Modus für aktive Benutzer.","section_premium_kicker":"Preise","section_premium_h2":"Starten Sie kostenlos, entfernen Sie Limits, wenn der Bot zum täglichen Werkzeug wird","plan_free_badge":"Kostenlos","plan_free_h3":"Für erste Übersetzungen","plan_free_p":"Geeignet zum Überprüfen der Übersetzungsqualität und Einrichten eines bequemen Antwortformats.","plan_free_price":"20","plan_free_price_unit":"Übersetzungen pro Tag","plan_free_li_1":"Sprach- und Textnachrichten","plan_free_li_2":"Zielsprachauswahl","plan_free_li_3":"Text- oder Sprachantwort","plan_premium_badge":"Premium","plan_premium_h3":"Für regelmäßige Nutzung","plan_premium_p":"Unbegrenzte Übersetzungen, vorrangige Verarbeitung und Unterstützung der Projektentwicklung.","plan_premium_price":"$3","plan_premium_price_unit":"/ Monat","plan_premium_li_1":"Unbegrenzte Übersetzungen","plan_premium_li_2":"Vorrangige Verarbeitung","plan_premium_li_3":"Jahresplan $30 mit Ersparnis","final_cta_h2":"Probieren Sie die Sprachübersetzung in der nächsten Nachricht","final_cta_p":"Öffnen Sie den Bot, drücken Sie Start und senden Sie einen Satz oder eine Sprachnachricht. Der kürzeste Weg zum Wert - direkt in Telegram.","final_cta_btn":"@translate_lng_bot öffnen","footer_copy":"© 2026 Voice Translate Bot","footer_powered":"Powered by Paymento.io","status_panel_title":"20+ Sprachen in einem Chat","status_panel_text":"Wählen Sie einmal eine Sprache, dann senden Sie einfach Text oder Sprache.","chat_recognized":"Erkannt","chat_translation":"Übersetzung","chat_user_request":"Übersetzung vorlesen","chat_bot_response":"Fertig. Sprachnachricht auf Englisch gesendet.","chat_user_question":"Wo ist die nächste U-Bahn-Station?","chat_translation_result":"Where is the nearest metro station?"},"fr":{"meta_description":"Voice Translate Bot traduit les messages vocaux et textuels directement dans Telegram: reconnaissance vocale, traduction en 20+ langues et synthèse vocale.","title":"Voice Translate Bot - traducteur vocal dans Telegram","brand":"Voice Translate Bot","nav_how":"Comment ça marche","nav_features":"Fonctionnalités","nav_premium":"Premium","nav_cta":"Ouvrir dans Telegram","eyebrow":"Bot Telegram pour la traduction vocale et textuelle","hero_h1":"Parlez n'importe quelle langue directement dans Telegram","hero_p":"Voice Translate Bot reconnaît les messages vocaux, traduit le texte et peut vocaliser le résultat. Pas de nouvelles applications, de paramètres complexes ou de basculement entre les services.","hero_cta_primary":"Démarrer le bot","hero_cta_secondary":"Voir comment ça marche","proof_1_num":"20+","proof_1_text":"langues de traduction","proof_2_num":"3","proof_2_text":"modes de réponse","proof_3_num":"0","proof_3_text":"applications supplémentaires","section_how_kicker":"Flux de travail","section_how_h2":"Un chat familier au lieu d'un ensemble de traducteurs","section_how_p":"La page de destination mène à l'action principale: ouvrir Telegram et essayer immédiatement de traduire un message vocal ou textuel.","step_1_h3":"Envoyer la voix","step_1_p":"Le bot accepte les messages vocaux réguliers et reconnaît automatiquement la parole.","step_2_h3":"Obtenir la traduction","step_2_p":"Le résultat arrive dans le chat sous forme de texte, en tenant compte de la langue cible sélectionnée.","step_3_h3":"Activer la sortie vocale","step_3_p":"Vous pouvez laisser uniquement le texte, uniquement la voix ou les deux formats de réponse.","section_features_kicker":"Fonctionnalités","section_features_h2":"Conçu pour les conversations rapides, les voyages et la correspondance professionnelle","section_features_p":"La page met l'accent sur la valeur pratique: moins de copie, plus de communication en direct.","feature_1_h3":"Messages vocaux","feature_1_p":"Traduisez les messages vocaux sans transcription manuelle et transfert vers des services tiers.","feature_2_h3":"Traduction de texte","feature_2_p":"Envoyez une phrase, une lettre ou une note pour obtenir rapidement une traduction dans la langue souhaitée.","feature_3_h3":"Sortie vocale","feature_3_p":"Écoutez la traduction en audio lorsque vous avez besoin de prononciation ou d'une réponse vocale.","feature_4_h3":"Paramètres et Premium","feature_4_p":"Le bot mémorise la langue, le format de réponse et ouvre le mode illimité pour les utilisateurs actifs.","section_premium_kicker":"Tarification","section_premium_h2":"Commencez gratuitement, supprimez les limites lorsque le bot devient un outil quotidien","plan_free_badge":"Gratuit","plan_free_h3":"Pour les premières traductions","plan_free_p":"Convient pour vérifier la qualité de la traduction et configurer un format de réponse pratique.","plan_free_price":"20","plan_free_price_unit":"traductions par jour","plan_free_li_1":"Messages vocaux et textuels","plan_free_li_2":"Sélection de la langue cible","plan_free_li_3":"Réponse textuelle ou vocale","plan_premium_badge":"Premium","plan_premium_h3":"Pour une utilisation régulière","plan_premium_p":"Traductions illimitées, traitement prioritaire et soutien au développement du projet.","plan_premium_price":"$3","plan_premium_price_unit":"/ mois","plan_premium_li_1":"Traductions illimitées","plan_premium_li_2":"Traitement prioritaire","plan_premium_li_3":"Plan annuel $30 avec économies","final_cta_h2":"Essayez la traduction vocale dans le prochain message","final_cta_p":"Ouvrez le bot, appuyez sur Start et envoyez une phrase ou un message vocal. Le chemin le plus court vers la valeur - directement dans Telegram.","final_cta_btn":"Ouvrir @translate_lng_bot","footer_copy":"© 2026 Voice Translate Bot","footer_powered":"Powered by Paymento.io","status_panel_title":"20+ langues dans un seul chat","status_panel_text":"Choisissez une langue une fois, puis envoyez simplement du texte ou de la voix.","chat_recognized":"Reconnu","chat_translation":"Traduction","chat_user_request":"Vocaliser la traduction","chat_bot_response":"Terminé. Message vocal envoyé en anglais.","chat_user_question":"Où est la station de métro la plus proche?","chat_translation_result":"Where is the nearest metro station?"},"es":{"meta_description":"Voice Translate Bot traduce mensajes de voz y texto directamente en Telegram: reconocimiento de voz, traducción a 20+ idiomas y síntesis de voz.","title":"Voice Translate Bot - traductor de voz en Telegram","brand":"Voice Translate Bot","nav_how":"Cómo funciona","nav_features":"Características","nav_premium":"Premium","nav_cta":"Abrir en Telegram","eyebrow":"Bot de Telegram para traducción de voz y texto","hero_h1":"Habla cualquier idioma directamente en Telegram","hero_p":"Voice Translate Bot reconoce mensajes de voz, traduce texto y puede vocalizar el resultado. Sin nuevas aplicaciones, configuraciones complejas o cambio entre servicios.","hero_cta_primary":"Iniciar el bot","hero_cta_secondary":"Ver cómo funciona","proof_1_num":"20+","proof_1_text":"idiomas de traducción","proof_2_num":"3","proof_2_text":"modos de respuesta","proof_3_num":"0","proof_3_text":"aplicaciones adicionales","section_how_kicker":"Flujo de trabajo","section_how_h2":"Un chat familiar en lugar de un conjunto de traductores","section_how_p":"La página de destino conduce a la acción principal: abrir Telegram e intentar inmediatamente traducir un mensaje de voz o texto.","step_1_h3":"Enviar voz","step_1_p":"El bot acepta mensajes de voz regulares y reconoce automáticamente el habla.","step_2_h3":"Obtener traducción","step_2_p":"El resultado llega al chat como texto, teniendo en cuenta el idioma de destino seleccionado.","step_3_h3":"Activar salida de voz","step_3_p":"Puede dejar solo texto, solo voz o ambos formatos de respuesta.","section_features_kicker":"Características","section_features_h2":"Hecho para conversaciones rápidas, viajes y correspondencia laboral","section_features_p":"La página enfatiza el valor práctico: menos copia, más comunicación en vivo.","feature_1_h3":"Mensajes de voz","feature_1_p":"Traduzca mensajes de voz sin transcripción manual y reenvío a servicios de terceros.","feature_2_h3":"Traducción de texto","feature_2_p":"Envíe una frase, carta o nota para obtener rápidamente una traducción en el idioma deseado.","feature_3_h3":"Salida de voz","feature_3_p":"Escuche la traducción como audio cuando necesite pronunciación o una respuesta de voz.","feature_4_h3":"Configuración y Premium","feature_4_p":"El bot recuerda el idioma, el formato de respuesta y abre el modo ilimitado para usuarios activos.","section_premium_kicker":"Precios","section_premium_h2":"Comience gratis, elimine los límites cuando el bot se convierta en una herramienta diaria","plan_free_badge":"Gratis","plan_free_h3":"Para primeras traducciones","plan_free_p":"Adecuado para verificar la calidad de la traducción y configurar un formato de respuesta conveniente.","plan_free_price":"20","plan_free_price_unit":"traducciones por día","plan_free_li_1":"Mensajes de voz y texto","plan_free_li_2":"Selección de idioma de destino","plan_free_li_3":"Respuesta de texto o voz","plan_premium_badge":"Premium","plan_premium_h3":"Para uso regular","plan_premium_p":"Traducciones ilimitadas, procesamiento prioritario y apoyo al desarrollo del proyecto.","plan_premium_price":"$3","plan_premium_price_unit":"/ mes","plan_premium_li_1":"Traducciones ilimitadas","plan_premium_li_2":"Procesamiento prioritario","plan_premium_li_3":"Plan anual $30 con ahorros","final_cta_h2":"Pruebe la traducción de voz en el próximo mensaje","final_cta_p":"Abra el bot, presione Start y envíe una frase o mensaje de voz. El camino más corto al valor - directamente en Telegram.","final_cta_btn":"Abrir @translate_lng_bot","footer_copy":"© 2026 Voice Translate Bot","footer_powered":"Powered by Paymento.io","status_panel_title":"20+ idiomas en un solo chat","status_panel_text":"Elija un idioma una vez, luego simplemente envíe texto o voz.","chat_recognized":"Reconocido","chat_translation":"Traducción","chat_user_request":"Vocalizar la traducción","chat_bot_response":"Hecho. Mensaje de voz enviado en inglés.","chat_user_question":"¿Dónde está la estación de metro más cercana?","chat_translation_result":"Where is the nearest metro station?"}};
+    const SUPPORTED_LANGUAGES = ["ru","de","en","fr","es"];
+    const DEFAULT_LANGUAGE = "en";
+    const languageSelect = document.getElementById('languageSelect');
+
+    function normalizeLanguage(language) {
+      return String(language || '').toLowerCase().split('-')[0];
+    }
+
+    function detectInitialLanguage() {
+      const savedLanguage = localStorage.getItem('landingLanguage');
+      if (SUPPORTED_LANGUAGES.includes(savedLanguage)) return savedLanguage;
+
+      const browserLanguages = navigator.languages && navigator.languages.length
+        ? navigator.languages
+        : [navigator.language || navigator.userLanguage];
+
+      for (const language of browserLanguages) {
+        const normalized = normalizeLanguage(language);
+        if (SUPPORTED_LANGUAGES.includes(normalized)) return normalized;
+      }
+
+      return DEFAULT_LANGUAGE;
+    }
+
+    function setLanguage(language) {
+      const lang = SUPPORTED_LANGUAGES.includes(language) ? language : DEFAULT_LANGUAGE;
+      const dictionary = TRANSLATIONS[lang] || TRANSLATIONS[DEFAULT_LANGUAGE];
+
+      document.documentElement.lang = lang;
+      document.title = dictionary.title;
+      document.querySelector('meta[name="description"]').setAttribute('content', dictionary.meta_description);
+
+      document.querySelectorAll('[data-i18n]').forEach((node) => {
+        const key = node.getAttribute('data-i18n');
+        if (dictionary[key] !== undefined) node.textContent = dictionary[key];
+      });
+
+      languageSelect.value = lang;
+      localStorage.setItem('landingLanguage', lang);
+    }
+
+    languageSelect.addEventListener('change', (event) => setLanguage(event.target.value));
+    setLanguage(detectInitialLanguage());
+  </script>
+</body>
+</html>
