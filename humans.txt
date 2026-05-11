@@ -1,0 +1,21 @@
+/* TEAM */
+Project: Voice Translate Bot
+Site: https://github.com/dronov-dmitry/translate-bot/
+Description: AI-powered voice and text translator for Telegram
+Location: Global
+
+/* THANKS */
+Telegram Bot API
+Google Translate API
+Speech Recognition Services
+Text-to-Speech Services
+
+/* SITE */
+Last update: 2026/05/11
+Language: English / Русский / Deutsch / Français / Español
+Doctype: HTML5
+IDE: Various
+Standards: HTML5, CSS3, JavaScript ES6+
+Components: Telegram Bot API, AI Translation
+Software: Python, aiogram, FFmpeg
+SEO: Optimized for search engines and AI crawlers

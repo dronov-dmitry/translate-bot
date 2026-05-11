@@ -3,59 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- Primary Meta Tags -->
-  <title>Voice Translate Bot - AI Voice & Text Translator for Telegram | 20+ Languages</title>
-  <meta name="title" content="Voice Translate Bot - AI Voice & Text Translator for Telegram | 20+ Languages">
-  <meta name="description" content="Free Telegram bot for instant voice and text translation. Speech recognition, 20+ languages, text-to-speech output. No apps needed - translate directly in Telegram chat.">
-  <meta name="keywords" content="telegram translator bot, voice translator, speech to text telegram, telegram translation bot, voice message translator, multilingual telegram bot, AI translator, free translation bot, telegram voice recognition, text to speech telegram">
-  <meta name="author" content="Voice Translate Bot">
-  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-  <link rel="canonical" href="https://github.com/dronov-dmitry/translate-bot/">
-  
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://github.com/dronov-dmitry/translate-bot/">
-  <meta property="og:title" content="Voice Translate Bot - AI Voice & Text Translator for Telegram">
-  <meta property="og:description" content="Free Telegram bot for instant voice and text translation. Speech recognition, 20+ languages, text-to-speech output. Start translating in seconds!">
-  <meta property="og:image" content="https://github.com/dronov-dmitry/translate-bot/og-image.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:locale" content="en_US">
-  <meta property="og:site_name" content="Voice Translate Bot">
-  
-  <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:url" content="https://github.com/dronov-dmitry/translate-bot/">
-  <meta name="twitter:title" content="Voice Translate Bot - AI Voice & Text Translator for Telegram">
-  <meta name="twitter:description" content="Free Telegram bot for instant voice and text translation. Speech recognition, 20+ languages, text-to-speech output.">
-  <meta name="twitter:image" content="https://github.com/dronov-dmitry/translate-bot/twitter-image.png">
-  
-  <!-- Alternate Languages (hreflang) -->
-  <link rel="alternate" hreflang="en" href="https://github.com/dronov-dmitry/translate-bot/">
-  <link rel="alternate" hreflang="ru" href="https://github.com/dronov-dmitry/translate-bot/?lang=ru">
-  <link rel="alternate" hreflang="de" href="https://github.com/dronov-dmitry/translate-bot/?lang=de">
-  <link rel="alternate" hreflang="fr" href="https://github.com/dronov-dmitry/translate-bot/?lang=fr">
-  <link rel="alternate" hreflang="es" href="https://github.com/dronov-dmitry/translate-bot/?lang=es">
-  <link rel="alternate" hreflang="x-default" href="https://github.com/dronov-dmitry/translate-bot/">
-  
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗣️</text></svg>">
-  
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="/manifest.json">
-  
-  <!-- Apple Touch Icon -->
-  <link rel="apple-touch-icon" href="/icon-192.png">
-  
-  <!-- Preconnect for Performance -->
-  <link rel="preconnect" href="https://t.me">
-  
-  <!-- Theme Color -->
-  <meta name="theme-color" content="#168acd">
-  
-  <!-- Humans.txt -->
-  <link rel="author" href="/humans.txt">
+  <meta name="description" content="Voice Translate Bot translates voice and text messages directly in Telegram: speech recognition, translation to 20+ languages and text-to-speech output.">
+  <title>Voice Translate Bot - voice translator in Telegram</title>
   <style>
     :root {
       --ink: #14151a;
@@ -425,148 +374,8 @@
       .final-cta .btn { justify-self: end; }
     }
   </style>
-  
-  <!-- Structured Data (JSON-LD) for Search Engines -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "Voice Translate Bot",
-    "applicationCategory": "CommunicationApplication",
-    "operatingSystem": "Telegram",
-    "offers": {
-      "@type": "AggregateOffer",
-      "priceCurrency": "USD",
-      "lowPrice": "0",
-      "highPrice": "3",
-      "offerCount": "2",
-      "offers": [
-        {
-          "@type": "Offer",
-          "name": "Free Plan",
-          "price": "0",
-          "priceCurrency": "USD",
-          "description": "20 translations per day with voice and text support"
-        },
-        {
-          "@type": "Offer",
-          "name": "Premium Plan",
-          "price": "3",
-          "priceCurrency": "USD",
-          "billingDuration": "P1M",
-          "description": "Unlimited translations with priority processing"
-        }
-      ]
-    },
-    "description": "AI-powered Telegram bot for instant voice and text translation. Supports 20+ languages with speech recognition and text-to-speech capabilities.",
-    "url": "https://github.com/dronov-dmitry/translate-bot/",
-    "image": "https://github.com/dronov-dmitry/translate-bot/og-image.png",
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "ratingCount": "1250",
-      "bestRating": "5",
-      "worstRating": "1"
-    },
-    "featureList": [
-      "Voice message translation",
-      "Text translation",
-      "Speech recognition",
-      "Text-to-speech output",
-      "20+ language support",
-      "Telegram integration"
-    ],
-    "inLanguage": ["en", "ru", "de", "fr", "es", "it", "pt", "zh", "ja", "ko", "ar", "hi", "tr", "pl", "nl", "sv", "da", "no", "fi", "uk"]
-  }
-  </script>
-  
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "Voice Translate Bot",
-    "url": "https://github.com/dronov-dmitry/translate-bot/",
-    "logo": "https://github.com/dronov-dmitry/translate-bot/logo.png",
-    "sameAs": [
-      "https://t.me/translate_lng_bot"
-    ],
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "contactType": "Customer Support",
-      "url": "https://t.me/translate_lng_bot"
-    }
-  }
-  </script>
-  
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "How does Voice Translate Bot work?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Voice Translate Bot works directly in Telegram. Send a voice message or text, and the bot will recognize speech, translate it to your chosen language, and optionally provide voice output. No additional apps needed."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "How many languages does the bot support?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "The bot supports 20+ languages including English, Russian, Spanish, French, German, Italian, Portuguese, Chinese, Japanese, Korean, Arabic, Hindi, Turkish, Polish, Dutch, Swedish, Danish, Norwegian, Finnish, and Ukrainian."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Is Voice Translate Bot free?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Yes, Voice Translate Bot offers a free plan with 20 translations per day. For unlimited translations and priority processing, Premium plans start at $3/month."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Can the bot translate voice messages?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Yes, the bot can recognize speech from voice messages, translate the text, and even provide voice output in the target language using text-to-speech technology."
-        }
-      }
-    ]
-  }
-  </script>
-  
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": "Voice Translate Bot - AI Voice & Text Translator for Telegram",
-    "description": "Free Telegram bot for instant voice and text translation with speech recognition and 20+ language support",
-    "url": "https://github.com/dronov-dmitry/translate-bot/",
-    "inLanguage": "en",
-    "isPartOf": {
-      "@type": "WebSite",
-      "name": "Voice Translate Bot",
-      "url": "https://github.com/dronov-dmitry/translate-bot/"
-    },
-    "breadcrumb": {
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "name": "Home",
-          "item": "https://github.com/dronov-dmitry/translate-bot/"
-        }
-      ]
-    }
-  }
-  </script>
 </head>
-<body itemscope itemtype="https://schema.org/WebPage">
+<body>
   <main class="page">
     <nav class="nav" aria-label="Main navigation">
       <div class="shell nav-inner">
@@ -587,10 +396,7 @@
       </div>
     </nav>
 
-    <header class="hero" id="top" itemscope itemtype="https://schema.org/Product">
-      <meta itemprop="name" content="Voice Translate Bot">
-      <meta itemprop="description" content="AI-powered voice and text translator for Telegram">
-      <meta itemprop="image" content="https://github.com/dronov-dmitry/translate-bot/og-image.png">
+    <header class="hero" id="top">
       <div class="hero-visual" aria-hidden="true">
         <div class="signal-board">
           <div class="language-strip">
@@ -621,10 +427,10 @@
       <div class="shell">
         <div class="hero-copy">
           <span class="eyebrow"><span class="dot"></span><span data-i18n="eyebrow">Telegram bot for voice and text translation</span></span>
-          <h1 data-i18n="hero_h1" itemprop="headline">Speak any language directly in Telegram</h1>
-          <p data-i18n="hero_p" itemprop="description">Voice Translate Bot recognizes voice messages, translates text and can voice the result. No new apps, complex settings or switching between services.</p>
+          <h1 data-i18n="hero_h1">Speak any language directly in Telegram</h1>
+          <p data-i18n="hero_p">Voice Translate Bot recognizes voice messages, translates text and can voice the result. No new apps, complex settings or switching between services.</p>
           <div class="hero-actions">
-            <a class="btn btn-primary" href="https://t.me/translate_lng_bot" data-i18n="hero_cta_primary" rel="noopener" itemprop="url">Start the bot</a>
+            <a class="btn btn-primary" href="https://t.me/translate_lng_bot" data-i18n="hero_cta_primary">Start the bot</a>
             <a class="btn btn-secondary" href="#how" data-i18n="hero_cta_secondary">See how it works</a>
           </div>
           <div class="proof" aria-label="Key benefits">
@@ -636,11 +442,11 @@
       </div>
     </header>
 
-    <section id="how" aria-labelledby="how-heading">
+    <section id="how">
       <div class="shell">
         <div class="section-head">
           <p class="section-kicker" data-i18n="section_how_kicker">Workflow</p>
-          <h2 id="how-heading" data-i18n="section_how_h2">One familiar chat instead of a set of translators</h2>
+          <h2 data-i18n="section_how_h2">One familiar chat instead of a set of translators</h2>
           <p data-i18n="section_how_p">The landing page leads to the main action: open Telegram and immediately try translating a voice or text message.</p>
         </div>
         <div class="steps">
@@ -651,11 +457,11 @@
       </div>
     </section>
 
-    <section class="feature-band" id="features" aria-labelledby="features-heading">
+    <section class="feature-band" id="features">
       <div class="shell">
         <div class="section-head">
           <p class="section-kicker" data-i18n="section_features_kicker">Features</p>
-          <h2 id="features-heading" data-i18n="section_features_h2">Made for quick conversations, trips and work correspondence</h2>
+          <h2 data-i18n="section_features_h2">Made for quick conversations, trips and work correspondence</h2>
           <p data-i18n="section_features_p">The page emphasizes practical value: less copying, more live communication.</p>
         </div>
         <div class="features-grid">
@@ -667,11 +473,11 @@
       </div>
     </section>
 
-    <section id="premium" aria-labelledby="premium-heading">
+    <section id="premium">
       <div class="shell">
         <div class="section-head">
           <p class="section-kicker" data-i18n="section_premium_kicker">Pricing</p>
-          <h2 id="premium-heading" data-i18n="section_premium_h2">Start for free, remove limits when the bot becomes a daily tool</h2>
+          <h2 data-i18n="section_premium_h2">Start for free, remove limits when the bot becomes a daily tool</h2>
         </div>
         <div class="pricing">
           <article class="plan">
@@ -699,7 +505,7 @@
       </div>
     </section>
 
-    <footer role="contentinfo"><div class="shell footer-inner"><span data-i18n="footer_copy">© 2026 Voice Translate Bot</span><span data-i18n="footer_powered">Powered by Paymento.io</span></div></footer>
+    <footer><div class="shell footer-inner"><span data-i18n="footer_copy">© 2026 Voice Translate Bot</span><span data-i18n="footer_powered">Powered by Paymento.io</span></div></footer>
   </main>
 
   <script>
