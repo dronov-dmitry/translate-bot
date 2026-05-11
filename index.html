@@ -1,0 +1,876 @@
+    <!DOCTYPE html>
+    <html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Voice Translate Bot переводит голосовые и текстовые сообщения прямо в Telegram: распознавание речи, перевод на 20+ языков и озвучка результата.">
+        <title>Voice Translate Bot - голосовой переводчик в Telegram</title>
+        <style>
+            :root {
+                --ink: #14151a;
+                --muted: #656b76;
+                --line: #e5e7df;
+                --paper: #fffdf7;
+                --mist: #f3f7f2;
+                --telegram: #168acd;
+                --teal: #0f9f8f;
+                --coral: #f06449;
+                --gold: #edb83d;
+                --green: #1b7f52;
+                --shadow: 0 24px 70px rgba(29, 35, 42, 0.12);
+            }
+
+            * { box-sizing: border-box; }
+
+            html { scroll-behavior: smooth; }
+
+            body {
+                margin: 0;
+                color: var(--ink);
+                background: var(--paper);
+                font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                line-height: 1.5;
+            }
+
+            a { color: inherit; }
+
+            .page {
+                overflow: hidden;
+                background:
+                    linear-gradient(90deg, rgba(20, 21, 26, 0.035) 1px, transparent 1px),
+                    linear-gradient(rgba(20, 21, 26, 0.035) 1px, transparent 1px),
+                    var(--paper);
+                background-size: 44px 44px;
+            }
+
+            .shell {
+                width: min(1160px, calc(100% - 40px));
+                margin: 0 auto;
+            }
+
+            .nav {
+                position: fixed;
+                inset: 0 0 auto;
+                z-index: 20;
+                border-bottom: 1px solid rgba(20, 21, 26, 0.08);
+                background: rgba(255, 253, 247, 0.86);
+                backdrop-filter: blur(18px);
+            }
+
+            .nav-inner {
+                min-height: 72px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 24px;
+            }
+
+            .brand {
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                font-weight: 860;
+                text-decoration: none;
+            }
+
+            .brand-mark {
+                width: 34px;
+                height: 34px;
+                display: grid;
+                place-items: center;
+                border: 1px solid rgba(20, 21, 26, 0.12);
+                border-radius: 8px;
+                background: #ffffff;
+                color: var(--telegram);
+                box-shadow: 0 8px 24px rgba(20, 21, 26, 0.08);
+            }
+
+            .nav-links {
+                display: flex;
+                align-items: center;
+                gap: 22px;
+                color: #464b53;
+                font-size: 14px;
+                font-weight: 680;
+            }
+
+            .nav-links a {
+                text-decoration: none;
+            }
+
+            .btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                min-height: 48px;
+                padding: 0 20px;
+                border: 1px solid transparent;
+                border-radius: 8px;
+                font-size: 15px;
+                font-weight: 780;
+                text-decoration: none;
+                transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
+                white-space: nowrap;
+            }
+
+            .btn:hover {
+                transform: translateY(-1px);
+            }
+
+            .btn-primary {
+                color: #fff;
+                background: var(--telegram);
+                box-shadow: 0 16px 36px rgba(22, 138, 205, 0.28);
+            }
+
+            .btn-primary:hover { background: #087cbd; }
+
+            .btn-secondary {
+                color: var(--ink);
+                background: rgba(255, 255, 255, 0.78);
+                border-color: rgba(20, 21, 26, 0.12);
+            }
+
+            .hero {
+                position: relative;
+                min-height: 760px;
+                padding: 154px 0 84px;
+                display: grid;
+                align-items: center;
+                isolation: isolate;
+                background:
+                    linear-gradient(115deg, rgba(255, 253, 247, 0.96) 0%, rgba(255, 253, 247, 0.82) 46%, rgba(243, 247, 242, 0.52) 100%);
+            }
+
+            .hero-visual {
+                position: absolute;
+                inset: 92px 18px 0 auto;
+                width: min(640px, 52vw);
+                z-index: -1;
+                opacity: 0.96;
+            }
+
+            .signal-board {
+                position: relative;
+                min-height: 620px;
+            }
+
+            .phone {
+                position: absolute;
+                right: 58px;
+                top: 12px;
+                width: 330px;
+                min-height: 610px;
+                border: 1px solid rgba(20, 21, 26, 0.16);
+                border-radius: 34px;
+                background: #fcfaf2;
+                box-shadow: var(--shadow);
+                padding: 18px;
+                transform: rotate(2deg);
+            }
+
+            .phone::before {
+                content: "";
+                position: absolute;
+                top: 10px;
+                left: 50%;
+                width: 92px;
+                height: 5px;
+                border-radius: 999px;
+                background: rgba(20, 21, 26, 0.18);
+                transform: translateX(-50%);
+            }
+
+            .phone-screen {
+                min-height: 572px;
+                padding: 30px 15px 16px;
+                border-radius: 24px;
+                background: linear-gradient(180deg, #f7fbf8 0%, #ffffff 100%);
+                border: 1px solid rgba(20, 21, 26, 0.08);
+            }
+
+            .chat-head {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding-bottom: 16px;
+                border-bottom: 1px solid rgba(20, 21, 26, 0.08);
+                font-size: 12px;
+                color: var(--muted);
+            }
+
+            .bot-name {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                color: var(--ink);
+                font-weight: 820;
+            }
+
+            .avatar {
+                width: 28px;
+                height: 28px;
+                display: grid;
+                place-items: center;
+                border-radius: 8px;
+                color: #fff;
+                background: var(--teal);
+                font-size: 14px;
+            }
+
+            .bubble {
+                width: fit-content;
+                max-width: 92%;
+                margin-top: 18px;
+                padding: 12px 13px;
+                border-radius: 8px;
+                font-size: 13px;
+                box-shadow: 0 10px 28px rgba(20, 21, 26, 0.06);
+            }
+
+            .bubble.user {
+                margin-left: auto;
+                color: #fff;
+                background: var(--telegram);
+            }
+
+            .bubble.bot {
+                background: #ffffff;
+                border: 1px solid rgba(20, 21, 26, 0.08);
+            }
+
+            .wave {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                min-width: 160px;
+                height: 28px;
+            }
+
+            .wave span {
+                width: 4px;
+                border-radius: 999px;
+                background: currentColor;
+                opacity: 0.86;
+            }
+
+            .wave span:nth-child(1) { height: 8px; }
+            .wave span:nth-child(2) { height: 18px; }
+            .wave span:nth-child(3) { height: 24px; }
+            .wave span:nth-child(4) { height: 14px; }
+            .wave span:nth-child(5) { height: 26px; }
+            .wave span:nth-child(6) { height: 12px; }
+            .wave span:nth-child(7) { height: 20px; }
+            .wave span:nth-child(8) { height: 9px; }
+
+            .language-strip {
+                position: absolute;
+                left: 18px;
+                top: 96px;
+                width: 196px;
+                padding: 12px;
+                display: grid;
+                gap: 8px;
+                border: 1px solid rgba(20, 21, 26, 0.1);
+                border-radius: 8px;
+                background: rgba(255, 255, 255, 0.84);
+                box-shadow: 0 18px 50px rgba(20, 21, 26, 0.1);
+                backdrop-filter: blur(16px);
+                transform: rotate(-5deg);
+            }
+
+            .lang-row {
+                display: flex;
+                justify-content: space-between;
+                gap: 10px;
+                padding: 9px 10px;
+                border-radius: 7px;
+                background: #fffaf0;
+                color: #3e444c;
+                font-size: 13px;
+                font-weight: 740;
+            }
+
+            .lang-row:nth-child(2) { background: #eef9f6; }
+            .lang-row:nth-child(3) { background: #fff1ec; }
+
+            .status-panel {
+                position: absolute;
+                right: 18px;
+                bottom: 34px;
+                width: 236px;
+                padding: 16px;
+                border: 1px solid rgba(20, 21, 26, 0.1);
+                border-radius: 8px;
+                background: #ffffff;
+                box-shadow: 0 20px 54px rgba(20, 21, 26, 0.11);
+            }
+
+            .status-panel strong {
+                display: block;
+                font-size: 15px;
+            }
+
+            .status-panel p {
+                margin: 7px 0 0;
+                color: var(--muted);
+                font-size: 13px;
+            }
+
+            .hero-copy {
+                max-width: 650px;
+                padding-top: 18px;
+            }
+
+            .eyebrow {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 18px;
+                padding: 8px 10px;
+                border: 1px solid rgba(20, 21, 26, 0.1);
+                border-radius: 8px;
+                background: rgba(255, 255, 255, 0.72);
+                color: #3d4650;
+                font-size: 13px;
+                font-weight: 760;
+            }
+
+            .dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: var(--green);
+                box-shadow: 0 0 0 5px rgba(27, 127, 82, 0.12);
+            }
+
+            h1 {
+                margin: 0;
+                max-width: 720px;
+                font-size: clamp(44px, 7vw, 88px);
+                line-height: 0.94;
+                letter-spacing: 0;
+            }
+
+            .hero-copy > p {
+                max-width: 560px;
+                margin: 26px 0 0;
+                color: #4e555f;
+                font-size: 20px;
+            }
+
+            .hero-actions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+                margin-top: 34px;
+            }
+
+            .proof {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 14px;
+                margin-top: 38px;
+            }
+
+            .proof-item {
+                min-width: 134px;
+                padding-right: 18px;
+                border-right: 1px solid rgba(20, 21, 26, 0.12);
+            }
+
+            .proof-item:last-child { border-right: 0; }
+
+            .proof-item strong {
+                display: block;
+                font-size: 24px;
+                line-height: 1;
+            }
+
+            .proof-item span {
+                display: block;
+                margin-top: 8px;
+                color: var(--muted);
+                font-size: 13px;
+                font-weight: 680;
+            }
+
+            section {
+                padding: 86px 0;
+                border-top: 1px solid rgba(20, 21, 26, 0.08);
+            }
+
+            .section-head {
+                max-width: 760px;
+                margin-bottom: 34px;
+            }
+
+            .section-kicker {
+                margin: 0 0 10px;
+                color: var(--teal);
+                font-size: 13px;
+                font-weight: 850;
+                text-transform: uppercase;
+            }
+
+            h2 {
+                margin: 0;
+                font-size: clamp(32px, 4vw, 52px);
+                line-height: 1.03;
+                letter-spacing: 0;
+            }
+
+            .section-head p {
+                margin: 16px 0 0;
+                color: var(--muted);
+                font-size: 18px;
+            }
+
+            .steps {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 14px;
+            }
+
+            .step,
+            .feature,
+            .plan {
+                border: 1px solid rgba(20, 21, 26, 0.1);
+                border-radius: 8px;
+                background: rgba(255, 255, 255, 0.7);
+                box-shadow: 0 16px 42px rgba(20, 21, 26, 0.06);
+            }
+
+            .step { padding: 22px; }
+
+            .step-number {
+                width: 36px;
+                height: 36px;
+                display: grid;
+                place-items: center;
+                border-radius: 8px;
+                background: var(--ink);
+                color: #fff;
+                font-weight: 860;
+            }
+
+            .step h3,
+            .feature h3,
+            .plan h3 {
+                margin: 18px 0 9px;
+                font-size: 20px;
+                line-height: 1.2;
+            }
+
+            .step p,
+            .feature p,
+            .plan p {
+                margin: 0;
+                color: var(--muted);
+            }
+
+            .feature-band {
+                background: var(--mist);
+            }
+
+            .features-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 14px;
+            }
+
+            .feature {
+                min-height: 230px;
+                padding: 20px;
+                background: #ffffff;
+            }
+
+            .feature-icon {
+                width: 42px;
+                height: 42px;
+                display: grid;
+                place-items: center;
+                border-radius: 8px;
+                color: #fff;
+                font-weight: 900;
+            }
+
+            .feature:nth-child(1) .feature-icon { background: var(--telegram); }
+            .feature:nth-child(2) .feature-icon { background: var(--teal); }
+            .feature:nth-child(3) .feature-icon { background: var(--coral); }
+            .feature:nth-child(4) .feature-icon { background: var(--gold); color: var(--ink); }
+
+            .pricing {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 18px;
+                align-items: stretch;
+            }
+
+            .plan {
+                padding: 26px;
+                position: relative;
+            }
+
+            .plan.featured {
+                background: #14151a;
+                color: #fff;
+                box-shadow: 0 24px 70px rgba(20, 21, 26, 0.22);
+            }
+
+            .plan.featured p,
+            .plan.featured li { color: rgba(255, 255, 255, 0.72); }
+
+            .badge {
+                display: inline-flex;
+                align-items: center;
+                min-height: 28px;
+                padding: 0 9px;
+                border-radius: 8px;
+                background: rgba(237, 184, 61, 0.18);
+                color: #7a5600;
+                font-size: 12px;
+                font-weight: 850;
+                text-transform: uppercase;
+            }
+
+            .featured .badge {
+                background: var(--gold);
+                color: var(--ink);
+            }
+
+            .price {
+                margin-top: 22px;
+                font-size: 44px;
+                line-height: 1;
+                font-weight: 900;
+            }
+
+            .price small {
+                color: currentColor;
+                font-size: 15px;
+                font-weight: 680;
+                opacity: 0.68;
+            }
+
+            ul {
+                margin: 24px 0 0;
+                padding: 0;
+                list-style: none;
+                display: grid;
+                gap: 12px;
+            }
+
+            li {
+                display: flex;
+                gap: 10px;
+                color: #4f5661;
+                font-weight: 650;
+            }
+
+            li::before {
+                content: "✓";
+                color: var(--green);
+                font-weight: 900;
+            }
+
+            .featured li::before { color: var(--gold); }
+
+            .final-cta {
+                padding: 92px 0;
+                color: #fff;
+                background: #14151a;
+            }
+
+            .final-grid {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto;
+                gap: 28px;
+                align-items: center;
+            }
+
+            .final-cta h2 { max-width: 760px; }
+
+            .final-cta p {
+                max-width: 620px;
+                margin: 16px 0 0;
+                color: rgba(255, 255, 255, 0.68);
+                font-size: 18px;
+            }
+
+            footer {
+                padding: 26px 0;
+                background: #14151a;
+                color: rgba(255, 255, 255, 0.52);
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                font-size: 14px;
+            }
+
+            .footer-inner {
+                display: flex;
+                justify-content: space-between;
+                gap: 16px;
+            }
+
+            @media (max-width: 980px) {
+                .hero {
+                    min-height: auto;
+                    padding-bottom: 48px;
+                }
+
+                .hero-visual {
+                    position: relative;
+                    inset: auto;
+                    width: 100%;
+                    margin-top: 34px;
+                    z-index: 0;
+                }
+
+                .signal-board { min-height: 560px; }
+                .phone { right: 8%; }
+                .language-strip { left: 3%; }
+                .status-panel { right: 0; }
+                .features-grid { grid-template-columns: repeat(2, 1fr); }
+            }
+
+            @media (max-width: 760px) {
+                .shell { width: min(100% - 28px, 1160px); }
+                .nav-inner { min-height: 64px; }
+                .nav-links a:not(.btn) { display: none; }
+                .nav .btn { min-height: 40px; padding: 0 12px; font-size: 13px; }
+                .hero { padding-top: 112px; }
+                h1 { font-size: clamp(42px, 15vw, 66px); }
+                .hero-copy > p { font-size: 18px; }
+                .proof { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+                .proof-item { min-width: 0; padding-right: 8px; }
+                .proof-item strong { font-size: 20px; }
+                .steps, .pricing { grid-template-columns: 1fr; }
+                .features-grid { grid-template-columns: 1fr; }
+                .phone {
+                    left: 50%;
+                    right: auto;
+                    width: min(318px, 88vw);
+                    transform: translateX(-50%) rotate(1deg);
+                }
+                .language-strip {
+                    top: 342px;
+                    left: 0;
+                    width: 178px;
+                }
+                .status-panel {
+                    right: 0;
+                    bottom: 4px;
+                    width: 206px;
+                }
+                .final-grid { grid-template-columns: 1fr; }
+                .footer-inner { flex-direction: column; }
+            }
+
+            @media (max-width: 420px) {
+                .brand span:last-child { display: none; }
+                .hero-actions .btn { width: 100%; }
+                .proof { grid-template-columns: 1fr; }
+                .proof-item { border-right: 0; border-bottom: 1px solid rgba(20, 21, 26, 0.1); padding-bottom: 12px; }
+                .signal-board { min-height: 600px; }
+                section { padding: 66px 0; }
+            }
+        </style>
+    </head>
+    <body>
+        <main class="page">
+            <nav class="nav" aria-label="Основная навигация">
+                <div class="shell nav-inner">
+                    <a class="brand" href="#top" aria-label="Voice Translate Bot">
+                        <span class="brand-mark">▶</span>
+                        <span>Voice Translate Bot</span>
+                    </a>
+                    <div class="nav-links">
+                        <a href="#how">Как работает</a>
+                        <a href="#features">Возможности</a>
+                        <a href="#premium">Premium</a>
+                        <a class="btn btn-primary" href="https://t.me/translate_lng_bot">Открыть в Telegram</a>
+                    </div>
+                </div>
+            </nav>
+
+            <header class="hero" id="top">
+                <div class="hero-visual" aria-hidden="true">
+                    <div class="signal-board">
+                        <div class="language-strip">
+                            <div class="lang-row"><span>RU</span><span>→ English</span></div>
+                            <div class="lang-row"><span>DE</span><span>→ Русский</span></div>
+                            <div class="lang-row"><span>ES</span><span>→ Français</span></div>
+                        </div>
+                        <div class="phone">
+                            <div class="phone-screen">
+                                <div class="chat-head">
+                                    <span class="bot-name"><span class="avatar">AI</span> Translate Bot</span>
+                                    <span>online</span>
+                                </div>
+                                <div class="bubble user">
+                                    <div class="wave">
+                                        <span></span><span></span><span></span><span></span>
+                                        <span></span><span></span><span></span><span></span>
+                                    </div>
+                                </div>
+                                <div class="bubble bot">
+                                    <strong>Распознано</strong><br>
+                                    Где находится ближайшая станция метро?
+                                </div>
+                                <div class="bubble bot">
+                                    <strong>Translation</strong><br>
+                                    Where is the nearest metro station?
+                                </div>
+                                <div class="bubble user">Озвучить перевод</div>
+                                <div class="bubble bot">
+                                    Готово. Отправил голосовое сообщение на английском.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="status-panel">
+                            <strong>20+ языков в одном чате</strong>
+                            <p>Выберите язык один раз, дальше просто отправляйте текст или голос.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="shell">
+                    <div class="hero-copy">
+                        <span class="eyebrow"><span class="dot"></span> Telegram-бот для перевода голоса и текста</span>
+                        <h1>Говорите на любом языке прямо в Telegram</h1>
+                        <p>Voice Translate Bot распознает голосовые сообщения, переводит текст и может озвучить результат. Без новых приложений, сложных настроек и переключения между сервисами.</p>
+                        <div class="hero-actions">
+                            <a class="btn btn-primary" href="https://t.me/translate_lng_bot">Запустить бота</a>
+                            <a class="btn btn-secondary" href="#how">Посмотреть сценарий</a>
+                        </div>
+                        <div class="proof" aria-label="Ключевые преимущества">
+                            <div class="proof-item">
+                                <strong>20+</strong>
+                                <span>языков перевода</span>
+                            </div>
+                            <div class="proof-item">
+                                <strong>3</strong>
+                                <span>режима ответа</span>
+                            </div>
+                            <div class="proof-item">
+                                <strong>0</strong>
+                                <span>лишних приложений</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section id="how">
+                <div class="shell">
+                    <div class="section-head">
+                        <p class="section-kicker">Сценарий</p>
+                        <h2>Один привычный чат вместо набора переводчиков</h2>
+                        <p>Лендинг ведет к главному действию: открыть Telegram и сразу попробовать перевод голосового или текстового сообщения.</p>
+                    </div>
+                    <div class="steps">
+                        <article class="step">
+                            <div class="step-number">1</div>
+                            <h3>Отправьте голос</h3>
+                            <p>Бот принимает обычные voice messages и автоматически распознает речь.</p>
+                        </article>
+                        <article class="step">
+                            <div class="step-number">2</div>
+                            <h3>Получите перевод</h3>
+                            <p>Результат приходит в чат текстом, с учетом выбранного целевого языка.</p>
+                        </article>
+                        <article class="step">
+                            <div class="step-number">3</div>
+                            <h3>Включите озвучку</h3>
+                            <p>Можно оставить только текст, только голос или оба формата ответа.</p>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <section class="feature-band" id="features">
+                <div class="shell">
+                    <div class="section-head">
+                        <p class="section-kicker">Возможности</p>
+                        <h2>Сделано для быстрых разговоров, поездок и рабочих переписок</h2>
+                        <p>Страница подчеркивает практическую ценность: меньше копирования, больше живой коммуникации.</p>
+                    </div>
+                    <div class="features-grid">
+                        <article class="feature">
+                            <div class="feature-icon">V</div>
+                            <h3>Голосовые сообщения</h3>
+                            <p>Переводите voice messages без ручной расшифровки и пересылки в сторонние сервисы.</p>
+                        </article>
+                        <article class="feature">
+                            <div class="feature-icon">T</div>
+                            <h3>Текстовый перевод</h3>
+                            <p>Отправьте фразу, письмо или заметку, чтобы быстро получить перевод в нужном языке.</p>
+                        </article>
+                        <article class="feature">
+                            <div class="feature-icon">S</div>
+                            <h3>Озвучивание</h3>
+                            <p>Слушайте перевод как аудио, когда нужно произношение или ответ голосом.</p>
+                        </article>
+                        <article class="feature">
+                            <div class="feature-icon">P</div>
+                            <h3>Настройки и Premium</h3>
+                            <p>Бот запоминает язык, формат ответа и открывает безлимитный режим для активных пользователей.</p>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <section id="premium">
+                <div class="shell">
+                    <div class="section-head">
+                        <p class="section-kicker">Тарифы</p>
+                        <h2>Начните бесплатно, снимите лимиты когда бот станет ежедневным инструментом</h2>
+                    </div>
+                    <div class="pricing">
+                        <article class="plan">
+                            <span class="badge">Free</span>
+                            <h3>Для первых переводов</h3>
+                            <p>Подходит, чтобы проверить качество перевода и настроить удобный формат ответа.</p>
+                            <div class="price">20 <small>переводов в день</small></div>
+                            <ul>
+                                <li>Голосовые и текстовые сообщения</li>
+                                <li>Выбор целевого языка</li>
+                                <li>Текстовый или голосовой ответ</li>
+                            </ul>
+                        </article>
+                        <article class="plan featured">
+                            <span class="badge">Premium</span>
+                            <h3>Для постоянного использования</h3>
+                            <p>Безлимитные переводы, приоритетная обработка и поддержка развития проекта.</p>
+                            <div class="price">$3 <small>/ месяц</small></div>
+                            <ul>
+                                <li>Безлимитные переводы</li>
+                                <li>Приоритетная обработка</li>
+                                <li>Годовой план $30 с экономией</li>
+                            </ul>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <section class="final-cta">
+                <div class="shell final-grid">
+                    <div>
+                        <h2>Попробуйте перевод голоса в следующем сообщении</h2>
+                        <p>Откройте бота, нажмите Start и отправьте фразу или голосовое. Самый короткий путь к ценности - прямо в Telegram.</p>
+                    </div>
+                    <a class="btn btn-primary" href="https://t.me/translate_lng_bot">Открыть @translate_lng_bot</a>
+                </div>
+            </section>
+
+            <footer>
+                <div class="shell footer-inner">
+                    <span>&copy; 2026 Voice Translate Bot</span>
+                    <span>Powered by Paymento.io</span>
+                </div>
+            </footer>
+        </main>
+    </body>
+    </html>
+    
